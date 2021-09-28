@@ -33,8 +33,8 @@ def serializedATN():
         buf.write("\b\n\2\2\2\u00f8\2\17\3\2\2\2\4\23\3\2\2\2\6>\3\2\2\2")
         buf.write("\b@\3\2\2\2\n\u00a5\3\2\2\2\f\r\5\4\3\2\r\16\7\3\2\2\16")
         buf.write("\20\3\2\2\2\17\f\3\2\2\2\20\21\3\2\2\2\21\17\3\2\2\2\21")
-        buf.write("\22\3\2\2\2\22\3\3\2\2\2\23\24\7\30\2\2\24\27\7)\2\2\25")
-        buf.write("\26\7\35\2\2\26\30\7)\2\2\27\25\3\2\2\2\27\30\3\2\2\2")
+        buf.write("\22\3\2\2\2\22\3\3\2\2\2\23\24\7\26\2\2\24\27\7)\2\2\25")
+        buf.write("\26\7\33\2\2\26\30\7)\2\2\27\25\3\2\2\2\27\30\3\2\2\2")
         buf.write("\30\31\3\2\2\2\31\37\7\4\2\2\32\33\5\6\4\2\33\34\7\3\2")
         buf.write("\2\34\36\3\2\2\2\35\32\3\2\2\2\36!\3\2\2\2\37\35\3\2\2")
         buf.write("\2\37 \3\2\2\2 \"\3\2\2\2!\37\3\2\2\2\"#\7\5\2\2#\5\3")
@@ -49,57 +49,57 @@ def serializedATN():
         buf.write("\5\n\6\33HI\7*\2\2IR\7\6\2\2JO\5\n\6\2KL\7\7\2\2LN\5\n")
         buf.write("\6\2MK\3\2\2\2NQ\3\2\2\2OM\3\2\2\2OP\3\2\2\2PS\3\2\2\2")
         buf.write("QO\3\2\2\2RJ\3\2\2\2RS\3\2\2\2ST\3\2\2\2T\u00a6\7\b\2")
-        buf.write("\2UV\7\33\2\2VW\5\n\6\2WX\7\"\2\2XY\5\n\6\2YZ\7\31\2\2")
-        buf.write("Z[\5\n\6\2[\\\7\32\2\2\\\u00a6\3\2\2\2]^\7#\2\2^_\5\n")
-        buf.write("\6\2_`\7 \2\2`a\5\n\6\2ab\7!\2\2b\u00a6\3\2\2\2cg\7\4")
-        buf.write("\2\2de\5\n\6\2ef\7\3\2\2fh\3\2\2\2gd\3\2\2\2hi\3\2\2\2")
-        buf.write("ig\3\2\2\2ij\3\2\2\2jk\3\2\2\2kl\7\5\2\2l\u00a6\3\2\2")
-        buf.write("\2mn\7\37\2\2no\7*\2\2op\7\t\2\2ps\7)\2\2qr\7\n\2\2rt")
-        buf.write("\5\n\6\2sq\3\2\2\2st\3\2\2\2t\177\3\2\2\2uv\7\7\2\2vw")
-        buf.write("\7*\2\2wx\7\t\2\2x{\7)\2\2yz\7\n\2\2z|\5\n\6\2{y\3\2\2")
-        buf.write("\2{|\3\2\2\2|~\3\2\2\2}u\3\2\2\2~\u0081\3\2\2\2\177}\3")
-        buf.write("\2\2\2\177\u0080\3\2\2\2\u0080\u0082\3\2\2\2\u0081\177")
-        buf.write("\3\2\2\2\u0082\u0083\7\34\2\2\u0083\u00a6\5\n\6\25\u0084")
-        buf.write("\u0085\7$\2\2\u0085\u0086\5\n\6\2\u0086\u008e\7\'\2\2")
-        buf.write("\u0087\u0088\7*\2\2\u0088\u0089\7\t\2\2\u0089\u008a\7")
-        buf.write(")\2\2\u008a\u008b\7\r\2\2\u008b\u008c\5\n\6\2\u008c\u008d")
-        buf.write("\7\3\2\2\u008d\u008f\3\2\2\2\u008e\u0087\3\2\2\2\u008f")
-        buf.write("\u0090\3\2\2\2\u0090\u008e\3\2\2\2\u0090\u0091\3\2\2\2")
-        buf.write("\u0091\u0092\3\2\2\2\u0092\u0093\7%\2\2\u0093\u00a6\3")
-        buf.write("\2\2\2\u0094\u0095\7&\2\2\u0095\u00a6\7)\2\2\u0096\u0097")
-        buf.write("\7\36\2\2\u0097\u00a6\5\n\6\22\u0098\u0099\7\22\2\2\u0099")
-        buf.write("\u00a6\5\n\6\r\u009a\u009b\7(\2\2\u009b\u00a6\5\n\6\t")
+        buf.write("\2UV\7\31\2\2VW\5\n\6\2WX\7 \2\2XY\5\n\6\2YZ\7\27\2\2")
+        buf.write("Z[\5\n\6\2[\\\7\30\2\2\\\u00a6\3\2\2\2]^\7!\2\2^_\5\n")
+        buf.write("\6\2_`\7\36\2\2`a\5\n\6\2ab\7\37\2\2b\u00a6\3\2\2\2cg")
+        buf.write("\7\4\2\2de\5\n\6\2ef\7\3\2\2fh\3\2\2\2gd\3\2\2\2hi\3\2")
+        buf.write("\2\2ig\3\2\2\2ij\3\2\2\2jk\3\2\2\2kl\7\5\2\2l\u00a6\3")
+        buf.write("\2\2\2mn\7\35\2\2no\7*\2\2op\7\t\2\2ps\7)\2\2qr\7\n\2")
+        buf.write("\2rt\5\n\6\2sq\3\2\2\2st\3\2\2\2t\177\3\2\2\2uv\7\7\2")
+        buf.write("\2vw\7*\2\2wx\7\t\2\2x{\7)\2\2yz\7\n\2\2z|\5\n\6\2{y\3")
+        buf.write("\2\2\2{|\3\2\2\2|~\3\2\2\2}u\3\2\2\2~\u0081\3\2\2\2\177")
+        buf.write("}\3\2\2\2\177\u0080\3\2\2\2\u0080\u0082\3\2\2\2\u0081")
+        buf.write("\177\3\2\2\2\u0082\u0083\7\32\2\2\u0083\u00a6\5\n\6\25")
+        buf.write("\u0084\u0085\7\"\2\2\u0085\u0086\5\n\6\2\u0086\u008e\7")
+        buf.write("%\2\2\u0087\u0088\7*\2\2\u0088\u0089\7\t\2\2\u0089\u008a")
+        buf.write("\7)\2\2\u008a\u008b\7\r\2\2\u008b\u008c\5\n\6\2\u008c")
+        buf.write("\u008d\7\3\2\2\u008d\u008f\3\2\2\2\u008e\u0087\3\2\2\2")
+        buf.write("\u008f\u0090\3\2\2\2\u0090\u008e\3\2\2\2\u0090\u0091\3")
+        buf.write("\2\2\2\u0091\u0092\3\2\2\2\u0092\u0093\7#\2\2\u0093\u00a6")
+        buf.write("\3\2\2\2\u0094\u0095\7$\2\2\u0095\u00a6\7)\2\2\u0096\u0097")
+        buf.write("\7\34\2\2\u0097\u00a6\5\n\6\22\u0098\u0099\7\22\2\2\u0099")
+        buf.write("\u00a6\5\n\6\r\u009a\u009b\7&\2\2\u009b\u00a6\5\n\6\t")
         buf.write("\u009c\u009d\7\6\2\2\u009d\u009e\5\n\6\2\u009e\u009f\7")
         buf.write("\b\2\2\u009f\u00a6\3\2\2\2\u00a0\u00a6\7*\2\2\u00a1\u00a6")
-        buf.write("\7+\2\2\u00a2\u00a6\7,\2\2\u00a3\u00a6\7\26\2\2\u00a4")
-        buf.write("\u00a6\7\27\2\2\u00a5D\3\2\2\2\u00a5H\3\2\2\2\u00a5U\3")
-        buf.write("\2\2\2\u00a5]\3\2\2\2\u00a5c\3\2\2\2\u00a5m\3\2\2\2\u00a5")
-        buf.write("\u0084\3\2\2\2\u00a5\u0094\3\2\2\2\u00a5\u0096\3\2\2\2")
-        buf.write("\u00a5\u0098\3\2\2\2\u00a5\u009a\3\2\2\2\u00a5\u009c\3")
-        buf.write("\2\2\2\u00a5\u00a0\3\2\2\2\u00a5\u00a1\3\2\2\2\u00a5\u00a2")
-        buf.write("\3\2\2\2\u00a5\u00a3\3\2\2\2\u00a5\u00a4\3\2\2\2\u00a6")
-        buf.write("\u00d1\3\2\2\2\u00a7\u00a8\f\21\2\2\u00a8\u00a9\7\16\2")
-        buf.write("\2\u00a9\u00d0\5\n\6\22\u00aa\u00ab\f\20\2\2\u00ab\u00ac")
-        buf.write("\7\17\2\2\u00ac\u00d0\5\n\6\21\u00ad\u00ae\f\17\2\2\u00ae")
-        buf.write("\u00af\7\20\2\2\u00af\u00d0\5\n\6\20\u00b0\u00b1\f\16")
-        buf.write("\2\2\u00b1\u00b2\7\21\2\2\u00b2\u00d0\5\n\6\17\u00b3\u00b4")
-        buf.write("\f\f\2\2\u00b4\u00b5\7\23\2\2\u00b5\u00d0\5\n\6\r\u00b6")
-        buf.write("\u00b7\f\13\2\2\u00b7\u00b8\7\24\2\2\u00b8\u00d0\5\n\6")
-        buf.write("\f\u00b9\u00ba\f\n\2\2\u00ba\u00bb\7\25\2\2\u00bb\u00d0")
-        buf.write("\5\n\6\13\u00bc\u00bf\f\32\2\2\u00bd\u00be\7\13\2\2\u00be")
-        buf.write("\u00c0\7)\2\2\u00bf\u00bd\3\2\2\2\u00bf\u00c0\3\2\2\2")
-        buf.write("\u00c0\u00c1\3\2\2\2\u00c1\u00c2\7\f\2\2\u00c2\u00c3\7")
-        buf.write("*\2\2\u00c3\u00cc\7\6\2\2\u00c4\u00c9\5\n\6\2\u00c5\u00c6")
-        buf.write("\7\7\2\2\u00c6\u00c8\5\n\6\2\u00c7\u00c5\3\2\2\2\u00c8")
-        buf.write("\u00cb\3\2\2\2\u00c9\u00c7\3\2\2\2\u00c9\u00ca\3\2\2\2")
-        buf.write("\u00ca\u00cd\3\2\2\2\u00cb\u00c9\3\2\2\2\u00cc\u00c4\3")
-        buf.write("\2\2\2\u00cc\u00cd\3\2\2\2\u00cd\u00ce\3\2\2\2\u00ce\u00d0")
-        buf.write("\7\b\2\2\u00cf\u00a7\3\2\2\2\u00cf\u00aa\3\2\2\2\u00cf")
-        buf.write("\u00ad\3\2\2\2\u00cf\u00b0\3\2\2\2\u00cf\u00b3\3\2\2\2")
-        buf.write("\u00cf\u00b6\3\2\2\2\u00cf\u00b9\3\2\2\2\u00cf\u00bc\3")
-        buf.write("\2\2\2\u00d0\u00d3\3\2\2\2\u00d1\u00cf\3\2\2\2\u00d1\u00d2")
-        buf.write("\3\2\2\2\u00d2\13\3\2\2\2\u00d3\u00d1\3\2\2\2\26\21\27")
-        buf.write("\37+.<>ORis{\177\u0090\u00a5\u00bf\u00c9\u00cc\u00cf\u00d1")
+        buf.write("\7+\2\2\u00a2\u00a6\7,\2\2\u00a3\u00a6\7\'\2\2\u00a4\u00a6")
+        buf.write("\7(\2\2\u00a5D\3\2\2\2\u00a5H\3\2\2\2\u00a5U\3\2\2\2\u00a5")
+        buf.write("]\3\2\2\2\u00a5c\3\2\2\2\u00a5m\3\2\2\2\u00a5\u0084\3")
+        buf.write("\2\2\2\u00a5\u0094\3\2\2\2\u00a5\u0096\3\2\2\2\u00a5\u0098")
+        buf.write("\3\2\2\2\u00a5\u009a\3\2\2\2\u00a5\u009c\3\2\2\2\u00a5")
+        buf.write("\u00a0\3\2\2\2\u00a5\u00a1\3\2\2\2\u00a5\u00a2\3\2\2\2")
+        buf.write("\u00a5\u00a3\3\2\2\2\u00a5\u00a4\3\2\2\2\u00a6\u00d1\3")
+        buf.write("\2\2\2\u00a7\u00a8\f\21\2\2\u00a8\u00a9\7\16\2\2\u00a9")
+        buf.write("\u00d0\5\n\6\22\u00aa\u00ab\f\20\2\2\u00ab\u00ac\7\17")
+        buf.write("\2\2\u00ac\u00d0\5\n\6\21\u00ad\u00ae\f\17\2\2\u00ae\u00af")
+        buf.write("\7\20\2\2\u00af\u00d0\5\n\6\20\u00b0\u00b1\f\16\2\2\u00b1")
+        buf.write("\u00b2\7\21\2\2\u00b2\u00d0\5\n\6\17\u00b3\u00b4\f\f\2")
+        buf.write("\2\u00b4\u00b5\7\23\2\2\u00b5\u00d0\5\n\6\r\u00b6\u00b7")
+        buf.write("\f\13\2\2\u00b7\u00b8\7\24\2\2\u00b8\u00d0\5\n\6\f\u00b9")
+        buf.write("\u00ba\f\n\2\2\u00ba\u00bb\7\25\2\2\u00bb\u00d0\5\n\6")
+        buf.write("\13\u00bc\u00bf\f\32\2\2\u00bd\u00be\7\13\2\2\u00be\u00c0")
+        buf.write("\7)\2\2\u00bf\u00bd\3\2\2\2\u00bf\u00c0\3\2\2\2\u00c0")
+        buf.write("\u00c1\3\2\2\2\u00c1\u00c2\7\f\2\2\u00c2\u00c3\7*\2\2")
+        buf.write("\u00c3\u00cc\7\6\2\2\u00c4\u00c9\5\n\6\2\u00c5\u00c6\7")
+        buf.write("\7\2\2\u00c6\u00c8\5\n\6\2\u00c7\u00c5\3\2\2\2\u00c8\u00cb")
+        buf.write("\3\2\2\2\u00c9\u00c7\3\2\2\2\u00c9\u00ca\3\2\2\2\u00ca")
+        buf.write("\u00cd\3\2\2\2\u00cb\u00c9\3\2\2\2\u00cc\u00c4\3\2\2\2")
+        buf.write("\u00cc\u00cd\3\2\2\2\u00cd\u00ce\3\2\2\2\u00ce\u00d0\7")
+        buf.write("\b\2\2\u00cf\u00a7\3\2\2\2\u00cf\u00aa\3\2\2\2\u00cf\u00ad")
+        buf.write("\3\2\2\2\u00cf\u00b0\3\2\2\2\u00cf\u00b3\3\2\2\2\u00cf")
+        buf.write("\u00b6\3\2\2\2\u00cf\u00b9\3\2\2\2\u00cf\u00bc\3\2\2\2")
+        buf.write("\u00d0\u00d3\3\2\2\2\u00d1\u00cf\3\2\2\2\u00d1\u00d2\3")
+        buf.write("\2\2\2\u00d2\13\3\2\2\2\u00d3\u00d1\3\2\2\2\26\21\27\37")
+        buf.write("+.<>ORis{\177\u0090\u00a5\u00bf\u00c9\u00cc\u00cf\u00d1")
         return buf.getvalue()
 
 
@@ -115,19 +115,22 @@ class CoolParser ( Parser ):
 
     literalNames = [ "<INVALID>", "';'", "'{'", "'}'", "'('", "','", "')'", 
                      "':'", "'<-'", "'@'", "'.'", "'=>'", "'+'", "'-'", 
-                     "'*'", "'/'", "'~'", "'<'", "'<='", "'='", "'true'", 
-                     "'false'" ]
+                     "'*'", "'/'", "'~'", "'<'", "'<='", "'='", "<INVALID>", 
+                     "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
+                     "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
+                     "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
+                     "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
+                     "'true'", "'false'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "KLASS", "ELSE", "FI", "IF", 
-                      "IN", "INHERITS", "ISVOID", "LET", "LOOP", "POOL", 
-                      "THEN", "WHILE", "CASE", "ESAC", "NEW", "OF", "NOT", 
-                      "TYPE", "ID", "INT", "STRING", "WS", "MULTICOMMENTS", 
-                      "INLINECOMMENTS" ]
+                      "KLASS", "ELSE", "FI", "IF", "IN", "INHERITS", "ISVOID", 
+                      "LET", "LOOP", "POOL", "THEN", "WHILE", "CASE", "ESAC", 
+                      "NEW", "OF", "NOT", "TRUE", "FALSE", "TYPE", "ID", 
+                      "INTEGER", "STRING", "WHITESPACE", "COMMENT", "LINE_COMMENT" ]
 
     RULE_program = 0
     RULE_klass = 1
@@ -157,32 +160,32 @@ class CoolParser ( Parser ):
     T__16=17
     T__17=18
     T__18=19
-    T__19=20
-    T__20=21
-    KLASS=22
-    ELSE=23
-    FI=24
-    IF=25
-    IN=26
-    INHERITS=27
-    ISVOID=28
-    LET=29
-    LOOP=30
-    POOL=31
-    THEN=32
-    WHILE=33
-    CASE=34
-    ESAC=35
-    NEW=36
-    OF=37
-    NOT=38
+    KLASS=20
+    ELSE=21
+    FI=22
+    IF=23
+    IN=24
+    INHERITS=25
+    ISVOID=26
+    LET=27
+    LOOP=28
+    POOL=29
+    THEN=30
+    WHILE=31
+    CASE=32
+    ESAC=33
+    NEW=34
+    OF=35
+    NOT=36
+    TRUE=37
+    FALSE=38
     TYPE=39
     ID=40
-    INT=41
+    INTEGER=41
     STRING=42
-    WS=43
-    MULTICOMMENTS=44
-    INLINECOMMENTS=45
+    WHITESPACE=43
+    COMMENT=44
+    LINE_COMMENT=45
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -573,11 +576,17 @@ class CoolParser ( Parser ):
         def NOT(self):
             return self.getToken(CoolParser.NOT, 0)
 
-        def INT(self):
-            return self.getToken(CoolParser.INT, 0)
+        def INTEGER(self):
+            return self.getToken(CoolParser.INTEGER, 0)
 
         def STRING(self):
             return self.getToken(CoolParser.STRING, 0)
+
+        def TRUE(self):
+            return self.getToken(CoolParser.TRUE, 0)
+
+        def FALSE(self):
+            return self.getToken(CoolParser.FALSE, 0)
 
         def getRuleIndex(self):
             return CoolParser.RULE_expr
@@ -622,7 +631,7 @@ class CoolParser ( Parser ):
                 self.state = 80
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
-                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CoolParser.T__1) | (1 << CoolParser.T__3) | (1 << CoolParser.T__15) | (1 << CoolParser.T__19) | (1 << CoolParser.T__20) | (1 << CoolParser.IF) | (1 << CoolParser.ISVOID) | (1 << CoolParser.LET) | (1 << CoolParser.WHILE) | (1 << CoolParser.CASE) | (1 << CoolParser.NEW) | (1 << CoolParser.NOT) | (1 << CoolParser.ID) | (1 << CoolParser.INT) | (1 << CoolParser.STRING))) != 0):
+                if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CoolParser.T__1) | (1 << CoolParser.T__3) | (1 << CoolParser.T__15) | (1 << CoolParser.IF) | (1 << CoolParser.ISVOID) | (1 << CoolParser.LET) | (1 << CoolParser.WHILE) | (1 << CoolParser.CASE) | (1 << CoolParser.NEW) | (1 << CoolParser.NOT) | (1 << CoolParser.TRUE) | (1 << CoolParser.FALSE) | (1 << CoolParser.ID) | (1 << CoolParser.INTEGER) | (1 << CoolParser.STRING))) != 0):
                     self.state = 72
                     self.expr(0)
                     self.state = 77
@@ -687,7 +696,7 @@ class CoolParser ( Parser ):
                     self.state = 103 
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)
-                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CoolParser.T__1) | (1 << CoolParser.T__3) | (1 << CoolParser.T__15) | (1 << CoolParser.T__19) | (1 << CoolParser.T__20) | (1 << CoolParser.IF) | (1 << CoolParser.ISVOID) | (1 << CoolParser.LET) | (1 << CoolParser.WHILE) | (1 << CoolParser.CASE) | (1 << CoolParser.NEW) | (1 << CoolParser.NOT) | (1 << CoolParser.ID) | (1 << CoolParser.INT) | (1 << CoolParser.STRING))) != 0)):
+                    if not ((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CoolParser.T__1) | (1 << CoolParser.T__3) | (1 << CoolParser.T__15) | (1 << CoolParser.IF) | (1 << CoolParser.ISVOID) | (1 << CoolParser.LET) | (1 << CoolParser.WHILE) | (1 << CoolParser.CASE) | (1 << CoolParser.NEW) | (1 << CoolParser.NOT) | (1 << CoolParser.TRUE) | (1 << CoolParser.FALSE) | (1 << CoolParser.ID) | (1 << CoolParser.INTEGER) | (1 << CoolParser.STRING))) != 0)):
                         break
 
                 self.state = 105
@@ -822,7 +831,7 @@ class CoolParser ( Parser ):
 
             elif la_ == 14:
                 self.state = 159
-                self.match(CoolParser.INT)
+                self.match(CoolParser.INTEGER)
                 pass
 
             elif la_ == 15:
@@ -832,12 +841,12 @@ class CoolParser ( Parser ):
 
             elif la_ == 16:
                 self.state = 161
-                self.match(CoolParser.T__19)
+                self.match(CoolParser.TRUE)
                 pass
 
             elif la_ == 17:
                 self.state = 162
-                self.match(CoolParser.T__20)
+                self.match(CoolParser.FALSE)
                 pass
 
 
@@ -970,7 +979,7 @@ class CoolParser ( Parser ):
                         self.state = 202
                         self._errHandler.sync(self)
                         _la = self._input.LA(1)
-                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CoolParser.T__1) | (1 << CoolParser.T__3) | (1 << CoolParser.T__15) | (1 << CoolParser.T__19) | (1 << CoolParser.T__20) | (1 << CoolParser.IF) | (1 << CoolParser.ISVOID) | (1 << CoolParser.LET) | (1 << CoolParser.WHILE) | (1 << CoolParser.CASE) | (1 << CoolParser.NEW) | (1 << CoolParser.NOT) | (1 << CoolParser.ID) | (1 << CoolParser.INT) | (1 << CoolParser.STRING))) != 0):
+                        if (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << CoolParser.T__1) | (1 << CoolParser.T__3) | (1 << CoolParser.T__15) | (1 << CoolParser.IF) | (1 << CoolParser.ISVOID) | (1 << CoolParser.LET) | (1 << CoolParser.WHILE) | (1 << CoolParser.CASE) | (1 << CoolParser.NEW) | (1 << CoolParser.NOT) | (1 << CoolParser.TRUE) | (1 << CoolParser.FALSE) | (1 << CoolParser.ID) | (1 << CoolParser.INTEGER) | (1 << CoolParser.STRING))) != 0):
                             self.state = 194
                             self.expr(0)
                             self.state = 199

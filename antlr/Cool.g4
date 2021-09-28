@@ -38,10 +38,10 @@ expr
     | NOT expr
     | '(' expr ')'
     | ID
-    | INT
+    | INTEGER
     | STRING
-    | 'true'
-    | 'false'
+    | TRUE
+    | FALSE
     ;
 
 /*
@@ -65,15 +65,15 @@ ESAC : E S A C ;
 NEW : N E W ;
 OF : O F ;
 NOT : N O T;
+TRUE : 'true' ;
+FALSE : 'false' ;
 TYPE : [A-Z] [a-zA-Z0-9_]* ; 
 ID : [a-z] [a-zA-Z0-9_]* ;
-INT : [0-9]+ ; 
-STRING : '"' .*?  '"' ; //Definition of strings, and escaping.
-WS : [ \t\f\n\r]+ -> skip ; // Other whitespace like v
-MULTICOMMENTS : '(*' .*? '*)' -> skip; // Definition of comments inline and mutliline
-INLINECOMMENTS : '--' .*? '\n' -> skip;
-// What about EOF
-
+INTEGER : [0-9]+ ; 
+STRING : '"' .*?  '"' ; // Escaping multiline strings, EOF
+WHITESPACE : [ \t\f\n\r]+ -> skip ; // Other whitespace like v
+COMMENT : '(*' .*? '*)' -> skip; // Definition of comments inline and mutliline
+LINE_COMMENT : '--' .*? '\n' -> skip; // EOF?
 
 fragment A : [aA] ;
 fragment C : [cC] ;
