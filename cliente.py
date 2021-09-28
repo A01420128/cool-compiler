@@ -3,7 +3,6 @@ from antlr.CoolLexer import *
 from antlr.CoolParser import *
 from antlr.CoolListener import *
 
-
 from antlr4 import *
 
 class GetAllTokens(CoolListener):

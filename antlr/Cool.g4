@@ -1,4 +1,8 @@
-// in---->tests/input/lteassociativity.cool no hubo errores aqui y tenia que haber
+/* Parser for Cool Language
+ * Integrantes:
+ * Alonso Sebastián Varela Sandoval A01335705
+ * Jose Javier Tlacuilo Fuentes A01420128
+ */
 grammar Cool;           
 
 program
@@ -70,10 +74,10 @@ FALSE : 'false' ;
 TYPE : [A-Z] [a-zA-Z0-9_]* ; 
 ID : [a-z] [a-zA-Z0-9_]* ;
 INTEGER : [0-9]+ ; 
-STRING : '"' .*?  '"' ; // Escaping multiline strings, EOF
-WHITESPACE : [ \t\f\n\r]+ -> skip ; // Other whitespace like v
-COMMENT : '(*' .*? '*)' -> skip; // Definition of comments inline and mutliline
-LINE_COMMENT : '--' .*? '\n' -> skip; // EOF?
+STRING : '"' .*?  '"' ;
+WHITESPACE : [ \t\f\n\r]+ -> skip ;
+COMMENT : '(*' .*? '*)' -> skip ; 
+LINE_COMMENT : '--' .*? '\n' -> skip;
 
 fragment A : [aA] ;
 fragment C : [cC] ;
