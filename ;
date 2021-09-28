@@ -1,0 +1,23 @@
+import sys
+from antlr.CoolLexer import *
+from antlr.CoolParser import *
+from antlr.CoolListener import *
+
+
+from antlr4 import *
+
+def gfiles_from_file(file_name: string):
+    good_names = list()
+
+    file_good = open('tests/cases.ok', 'r')
+    line = file_good.readlines()
+    for line in lines:
+        file_name = line.split(';')[0]
+        print(good_name)
+        good_names.push(file_name)
+
+def main():
+    parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("test.cool"))))
+
+if __name__ == '__main__':
+    main()

@@ -6,6 +6,9 @@ from antlr.CoolListener import *
 
 from antlr4 import *
 
+class GetAllTokens(CoolListener):
+    tokens = []
+
 class Printer(CoolListener):
    def exitEveryRule(self, ctx: ParserRuleContext):
        print("<{}>".format(ctx.getText()))
@@ -15,10 +18,14 @@ class Printer(CoolListener):
 def main():
     parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("test.cool"))))
     tree = parser.program()
+    listener = GetAllTokens()
     printer = Printer()
 
     walker = ParseTreeWalker()
     walker.walk(printer, tree)
+
+    print(listener.tokens)
+
 
 if __name__ == '__main__':
     main()
