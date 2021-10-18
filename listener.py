@@ -3,22 +3,35 @@ from antlr.CoolParser import CoolParser
 
 import myexceptions
 
-from structure import Method, SymbolTable, Klass, setBaseClasses
+from structure import Method, SymbolTable, Klass
 
 class Listener(CoolListener):
 
     def __init__(self):
         self.currentKlass = None
         self.baseKlasses = SymbolTable()
+        self.allKlasses = SymbolTable()
         self.setBaseClasses()
 
+    def exitProgram(self, ctx: CoolParser.ProgramContext):
+        try:
+            self.allKlasses['Main'].lookupMethod('main')
+        except KeyError as e:
+            raise myexceptions.NoMainException
+
     def enterKlass(self, ctx: CoolParser.KlassContext):
-        className = ctx.TYPE()[0].getText()
-        if className in self.baseKlasses:
+        types = ctx.TYPE()
+
+        klassName = types[0].getText()
+        if klassName in self.baseKlasses:
             raise myexceptions.RedefineBasicClassException
 
-        klass = Klass(className)
+        if len(types) > 1 and types[1].getText() in ['Bool', 'SELF_TYPE', 'String'] :
+            raise myexceptions.InvalidInheritsException
+
+        klass = Klass(klassName)
         self.currentKlass = klass
+        self.allKlasses[klassName] = klass
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
         if ctx.ID().getText() == 'self':
@@ -28,12 +41,23 @@ class Listener(CoolListener):
         name = ctx.ID().getText()
         _type = ctx.TYPE().getText()
         self.currentKlass.addMethod(name, Method(_type))
+    
+    def enterFormal(self, ctx: CoolParser.FormalContext):
+        if ctx.ID().getText() == 'self':
+            raise myexceptions.SelfVariableException
+        
+        if ctx.TYPE().getText() == 'SELF_TYPE':
+            raise myexceptions.SelftypeInvalidUseException
 
-    def exitKlass(self, ctx: CoolParser.KlassContext):
-        try:
-            self.currentKlass.lookupMethod('main')
-        except KeyError as e:
-            raise myexceptions.NoMainException()
+    def enterLet(self, ctx: CoolParser.LetContext):
+        ids = ctx.ID()
+        for id  in ids:
+            if id.getText() == "self":
+                raise myexceptions.SelfVariableException
+
+    def enterAssign(self, ctx: CoolParser.AssignContext):
+        if ctx.ID().getText() == 'self':
+            raise myexceptions.SelfAssignmentException
     
     def setBaseClasses(self):
         k = Klass('Object')
@@ -56,3 +80,5 @@ class Listener(CoolListener):
         self.baseKlasses['String'] = k
         k = Klass('Bool')
         self.baseKlasses['Bool'] = k
+        k = Klass('SELF_TYPE')
+        self.baseKlasses['SELF_TYPE'] = k
