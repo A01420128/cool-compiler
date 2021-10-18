@@ -5,6 +5,8 @@ import myexceptions
 
 import structure as st
 
+# TODO: Documentation of cases.
+
 class Listener(CoolListener):
 
     def __init__(self):
@@ -38,6 +40,7 @@ class Listener(CoolListener):
 
         klass = st.Klass(klassName) if (len(types) == 1) else st.Klass(klassName, inherits=types[1].getText())
         self.currentKlassTypes = st.SymbolTableWithScopes(klass)
+        self.currentKlassTypes['self'] = klassName   
         self.allKlasses[klassName] = klass
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
@@ -49,13 +52,12 @@ class Listener(CoolListener):
 
         expr = ctx.expr()
         if expr:
-            expr_id = expr.getChild(0).ID().getText()
-            # TODO: Find identifier being assigned.
-            # expr_text = expr.getChild(0).getText()
-            try:
-                self.currentKlassTypes[expr_id]
-            except KeyError as e:
-                raise myexceptions.UndeclaredIdentifier
+            if hasattr(expr.getChild(0), 'ID'):
+                expr_id = expr.getChild(0).ID().getText()
+                try:
+                    self.currentKlassTypes[expr_id]
+                except KeyError as e:
+                    raise myexceptions.UndeclaredIdentifier
         
         self.currentKlassTypes[id] = _type
 
