@@ -46,6 +46,16 @@ class Listener(CoolListener):
 
         if id == 'self':
             raise myexceptions.SelfVariableException
+
+        expr = ctx.expr()
+        if expr:
+            expr_id = expr.getChild(0).ID().getText()
+            # TODO: Find identifier being assigned.
+            # expr_text = expr.getChild(0).getText()
+            try:
+                self.currentKlassTypes[expr_id]
+            except KeyError as e:
+                raise myexceptions.UndeclaredIdentifier
         
         self.currentKlassTypes[id] = _type
 
