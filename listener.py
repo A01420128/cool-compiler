@@ -170,6 +170,15 @@ class Listener(CoolListener):
     def enterAssign(self, ctx: CoolParser.AssignContext):
         if ctx.ID().getText() == 'self':
             raise myexceptions.SelfAssignmentException
+
+    def exitAdd(self, ctx: CoolParser.AddContext):
+        # Type rule: both expr should be Int, pass Int
+        _left = ctx.getChild(0)
+        _right = ctx.getChild(2)
+        if (self.ctxTypes[_left] != 'Int' or self.ctxTypes[_right] != 'Int'):
+            raise myexceptions.TypeCheckMismatch
+        else:  
+            self.ctxTypes[ctx] = 'Int'
     
     def exitParens(self, ctx: CoolParser.ParensContext):
         # Type rule: Pass expr context
