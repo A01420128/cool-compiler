@@ -12,14 +12,19 @@ class Listener(CoolListener):
     def __init__(self):
         self.currentKlassTypes = None
         self.baseKlasses = st.SymbolTable()
-        self.allKlasses = st.SymbolTable()
+        self.ctxTypes = st.SymbolTable()
         self.pending_new = []
         self.pending_attr = dict()
+        self.pending_call = []
+
+        # Reset st.classes so that it doesnt save other file klasses
+        st._allClasses = {}
+        # Add classes to st
         self.setBaseClasses()
 
     def exitProgram(self, ctx: CoolParser.ProgramContext):
         try:
-            self.allKlasses['Main'].lookupMethod('main')
+            st.lookupClass('Main').lookupMethod('main')
         except KeyError as e:
             raise myexceptions.NoMainException
 
@@ -40,6 +45,16 @@ class Listener(CoolListener):
                         if x.conforms(y) or y.conforms(x):
                             raise  myexceptions.NotSupported
 
+        # Check that parameters in calls to methods are conformant
+        for call in self.pending_call:
+            _klass = st.lookupClass(call['klass'])
+            _method = _klass.lookupMethod(call['method'])
+            for i, _param_type in enumerate(_method.params.values()):
+                _param_klass = st.lookupClass(_param_type)
+                _called_klass = st.lookupClass(call['params_types'][i])
+                if not _param_klass.conforms(_called_klass):
+                    raise myexceptions.DoesNotConform
+
 
 
     def enterKlass(self, ctx: CoolParser.KlassContext):
@@ -55,7 +70,6 @@ class Listener(CoolListener):
         klass = st.Klass(klassName) if (len(types) == 1) else st.Klass(klassName, inherits=types[1].getText())
         self.currentKlassTypes = st.SymbolTableWithScopes(klass)
         self.currentKlassTypes['self'] = klassName   
-        self.allKlasses[klassName] = klass
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
         id = ctx.ID().getText()
@@ -85,13 +99,17 @@ class Listener(CoolListener):
         self.currentKlassTypes[id] = _type
 
     def enterMethod(self, ctx: CoolParser.MethodContext):
-        name = ctx.ID().getText()
-        _type = ctx.TYPE().getText()
-        self.currentKlassTypes.klass.addMethod(name, st.Method(_type))
-
         self.currentKlassTypes.openScope()
 
     def exitMethod(self, ctx: CoolParser.MethodContext):
+        # Add method and its formals to the klass
+        name = ctx.ID().getText()
+        _type = ctx.TYPE().getText()
+        _formals = ctx.formal()
+        _params = []
+        for _formal in _formals:
+            _params.append((_formal.ID().getText(), self.ctxTypes[_formal]))
+        self.currentKlassTypes.klass.addMethod(name, st.Method(_type, _params))
         self.currentKlassTypes.closeScope()
     
     def enterFormal(self, ctx: CoolParser.FormalContext):
@@ -104,6 +122,16 @@ class Listener(CoolListener):
             raise myexceptions.SelftypeInvalidUseException
         
         self.currentKlassTypes[id] = _type
+    
+    def exitFormal(self, ctx: CoolParser.FormalContext):
+        # Type rule: Pass TYPE()
+        _type = ctx.TYPE().getText()
+        self.ctxTypes[ctx] = _type
+    
+    def exitBase(self, ctx: CoolParser.BaseContext):
+        # Type Rule: Pass child type
+        _type = self.ctxTypes[ctx.getChild(0)]
+        self.ctxTypes[ctx] = _type
 
     def enterLet(self, ctx: CoolParser.LetContext):
         ids = ctx.ID()
@@ -112,18 +140,59 @@ class Listener(CoolListener):
             if ids[i].getText() == 'self':
                 raise myexceptions.SelfVariableException
             self.currentKlassTypes[ids[i]] = types[i]
-        
 
+    def enterNew(self, ctx: CoolParser.NewContext):
+        if hasattr(ctx.parentCtx, 'ID'):
+            to_id = ctx.parentCtx.ID().getText()
+            to_type = self.currentKlassTypes[to_id]
+            _type = ctx.TYPE().getText()
+            self.pending_new.append({"type": _type, "to": to_type})
+    
+    def exitNew(self, ctx: CoolParser.NewContext):
+        # Type Rule: Pass type in rule
+        _type = ctx.TYPE().getText()
+        self.ctxTypes[ctx] = _type
+
+    def exitCall(self, ctx: CoolParser.CallContext):
+        # Add informatio of the call for further validation of conformance
+        _expr = ctx.expr()
+        _klass = self.ctxTypes[_expr[0]]
+        _id = ctx.ID().getText()
+        _params = []
+        for i in range(1, len(_expr)):
+            _param_type = self.ctxTypes[_expr[i]]
+            _params.append(_param_type)
+        
+        self.pending_call.append({"klass": _klass, "method": _id, "params_types": _params})
+
+        # Type Rule: TODO
+        
     def enterAssign(self, ctx: CoolParser.AssignContext):
         if ctx.ID().getText() == 'self':
             raise myexceptions.SelfAssignmentException
-
-    def enterNew(self, ctx: CoolParser.NewContext):
-        to_id = ctx.parentCtx.ID().getText()
-        # TODO: Search in symbols table this type from formal or let. Add in let or formal.
-        to_type = self.currentKlassTypes[to_id]
-        _type = ctx.TYPE().getText()
-        self.pending_new.append({"type": _type, "to": to_type})
+    
+    def exitParens(self, ctx: CoolParser.ParensContext):
+        # Type rule: Pass expr context
+        _type = self.ctxTypes[ctx.expr()]
+        self.ctxTypes[ctx] = _type
+    
+    def exitInteger(self, ctx: CoolParser.IntegerContext):
+        # Type rule: Pass 'Int'
+        self.ctxTypes[ctx] = 'Int'
+    
+    def exitString(self, ctx: CoolParser.StringContext):
+        # Type rule: Pass 'String'
+        self.ctxTypes[ctx] = 'String'
+    
+    def exitBool(self, ctx: CoolParser.BoolContext):
+        # Type rule: Pass 'Bool'
+        self.ctxTypes[ctx] = 'Bool'
+    
+    def exitObject(self, ctx: CoolParser.ObjectContext):
+        _id = ctx.ID().getText()
+        _type = self.currentKlassTypes[_id]
+        self.ctxTypes[ctx] = _type
+        
     
     def setBaseClasses(self):
         k = st.Klass('Object')
