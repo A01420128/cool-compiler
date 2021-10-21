@@ -197,6 +197,28 @@ class Listener(CoolListener):
             print(_expr[0])
         # Type Rule: TODO
         
+    def exitEq(self, ctx: CoolParser.EqContext):
+        # Type rule: compare freely except if type Int, String or Bool, compare to same.
+        _expr = ctx.expr()
+        _left = self.ctxTypes[_expr[0]]
+        _right = self.ctxTypes[_expr[1]]
+        _except = ['Int', 'String', 'Bool']
+        if _left in _except or _right in _except:
+            if _left != _right:
+                raise myexceptions.TypeCheckMismatch
+
+        self.ctxTypes[ctx] = 'Bool'
+
+
+    def exitAdd(self, ctx: CoolParser.AddContext):
+        # Type rule: both expr should be Int, pass Int
+        _left = ctx.getChild(0)
+        _right = ctx.getChild(2)
+        if (self.ctxTypes[_left] != 'Int' or self.ctxTypes[_right] != 'Int'):
+            raise myexceptions.TypeCheckMismatch
+        else:  
+            self.ctxTypes[ctx] = 'Int'
+
     def enterAssign(self, ctx: CoolParser.AssignContext):
         # No id is self in assign
         if ctx.ID().getText() == 'self':
@@ -209,15 +231,6 @@ class Listener(CoolListener):
         _expr = ctx.expr()
         _type = self.ctxTypes[_expr]
         self.pending_new.append({"type": _type, "to": to_type})
-
-    def exitAdd(self, ctx: CoolParser.AddContext):
-        # Type rule: both expr should be Int, pass Int
-        _left = ctx.getChild(0)
-        _right = ctx.getChild(2)
-        if (self.ctxTypes[_left] != 'Int' or self.ctxTypes[_right] != 'Int'):
-            raise myexceptions.TypeCheckMismatch
-        else:  
-            self.ctxTypes[ctx] = 'Int'
     
     def exitParens(self, ctx: CoolParser.ParensContext):
         # Type rule: Pass expr context
