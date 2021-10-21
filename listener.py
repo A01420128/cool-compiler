@@ -14,6 +14,7 @@ class Listener(CoolListener):
         self.baseKlasses = st.SymbolTable()
         self.allKlasses = st.SymbolTable()
         self.pending_new = []
+        self.pending_attr = dict()
         self.setBaseClasses()
 
     def exitProgram(self, ctx: CoolParser.ProgramContext):
@@ -22,11 +23,24 @@ class Listener(CoolListener):
         except KeyError as e:
             raise myexceptions.NoMainException
 
+        # Check if assignment by new conforms to inheritance.
         for pending in self.pending_new:
             to_klass = st.lookupClass(pending['to'])
             klass = st.lookupClass(pending['type'])
             if not to_klass.conforms(klass):
                 raise myexceptions.DoesNotConform
+            
+        # Check if attributes are being overriden, attributes with same name and check klasses inheritance
+        for klasses in self.pending_attr.values():
+            for i in range(len(klasses)):
+                for j in range(1, len(klasses)):
+                    x = st.lookupClass(klasses[i])
+                    y = st.lookupClass(klasses[j])
+                    if x != y:
+                        if x.conforms(y) or y.conforms(x):
+                            raise  myexceptions.NotSupported
+
+
 
     def enterKlass(self, ctx: CoolParser.KlassContext):
         types = ctx.TYPE()
@@ -47,9 +61,11 @@ class Listener(CoolListener):
         id = ctx.ID().getText()
         _type = ctx.TYPE().getText()
 
+        # Attribute name cannot be self
         if id == 'self':
             raise myexceptions.SelfVariableException
 
+        # An attributed cant be assigned an uknown variable.
         expr = ctx.expr()
         if expr:
             if hasattr(expr.getChild(0), 'ID'):
@@ -58,6 +74,13 @@ class Listener(CoolListener):
                     self.currentKlassTypes[expr_id]
                 except KeyError as e:
                     raise myexceptions.UndeclaredIdentifier
+
+        # Save the attributes of a certain klass for future examination. (checking overriding)
+        klass = self.currentKlassTypes.klass.name
+        if id in self.pending_attr:
+            self.pending_attr[id].append(klass)
+        else:
+            self.pending_attr[id] = [klass]
         
         self.currentKlassTypes[id] = _type
 
