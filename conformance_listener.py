@@ -74,9 +74,14 @@ class ConformanceListener(CoolListener):
                         raise myexceptions.InvalidMethodOverride
             except KeyError:
                 pass
-
-
+        
+        # Track scope of arguments
         self.idsTypes.openScope()
+        _formals = ctx.formal()
+        for _formal in _formals:
+            self.idsTypes[_formal.ID().getText()] = _formal.TYPE().getText()
+
+
     
     def exitMethod(self, ctx: CoolParser.MethodContext):
         _expr = ctx.expr() 
@@ -137,12 +142,6 @@ class ConformanceListener(CoolListener):
         
         # Type Rule: Pass object
         storage.ctxTypes[ctx] = 'Object'
-
-    def exitLet(self, ctx: CoolParser.LetContext):
-        _expr = ctx.expr()
-        _last = _expr[len(_expr) - 1]
-        _lastType = storage.ctxTypes[_last]
-        storage.ctxTypes[ctx] = _lastType
     
     def exitIf(self, ctx: CoolParser.IfContext):
         # Type Rule: The union of the two branches
@@ -154,6 +153,15 @@ class ConformanceListener(CoolListener):
         _union = _trueKlass.union(_falseKlass)
 
         storage.ctxTypes[ctx] = _union
+    
+    def enterLet(self, ctx: CoolParser.LetContext):
+        # Add scoped variables again
+        self.idsTypes.openScope()
+        _ids = ctx.ID()
+        _types = ctx.TYPE()
+        for i in range(len(_ids)):
+            # Add type of identifier for future checks
+            self.idsTypes[_ids[i].getText()] = _types[i].getText()
 
     def exitLet(self, ctx: CoolParser.LetContext):
         _types = ctx.TYPE()
@@ -161,10 +169,17 @@ class ConformanceListener(CoolListener):
 
         # Check conformance of every saved expected type and its expression asigned.
         for i, _type in enumerate(_types):
-            _assign = storage.lookupClass(storage.ctxTypes[_expr[i]])
-            _to = storage.lookupClass(_type.getText())
-            if not _to.conforms(_assign):
-                raise myexceptions.DoesNotConform
+            # Only for all expr except the last one.
+            if i < (len(_expr) - 1):
+                _assign = storage.lookupClass(storage.ctxTypes[_expr[i]])
+                _to = storage.lookupClass(_type.getText())
+                if not _to.conforms(_assign):
+                    raise myexceptions.DoesNotConform
+
+        _last = _expr[len(_expr) - 1]
+        _lastType = storage.ctxTypes[_last]
+        storage.ctxTypes[ctx] = _lastType
+        self.idsTypes.closeScope()
     
     def exitNew(self, ctx: CoolParser.NewContext):
         # Type Rule: Pass type in rule
@@ -353,19 +368,23 @@ class ConformanceListener(CoolListener):
         if not _idKlass.conforms(_exprKlass):
             raise myexceptions.DoesNotConform
 
+        # Type Rule: pass type of expr
+        storage.ctxTypes[ctx] = _exprType
+
+
     def exitParens(self, ctx: CoolParser.ParensContext):
-        # Type rule: Pass expr context
+        # Type Rule: Pass expr context
         _type = storage.ctxTypes[ctx.expr()]
         storage.ctxTypes[ctx] = _type
     
     def exitInteger(self, ctx: CoolParser.IntegerContext):
-        # Type rule: Pass 'Int'
+        # Type Rule: Pass 'Int'
         storage.ctxTypes[ctx] = 'Int'
     
     def exitString(self, ctx: CoolParser.StringContext):
-        # Type rule: Pass 'String'
+        # Type Rule: Pass 'String'
         storage.ctxTypes[ctx] = 'String'
     
     def exitBool(self, ctx: CoolParser.BoolContext):
-        # Type rule: Pass 'Bool'
+        # Type Rule: Pass 'Bool'
         storage.ctxTypes[ctx] = 'Bool'
