@@ -52,9 +52,19 @@ class ConformanceListener(CoolListener):
         except KeyError:
             pass
 
-
         # Save id typE
         self.idsTypes[_id] = _type
+
+    def enterLet(self, ctx: CoolParser.LetContext):
+        _types = ctx.TYPE()
+        _expr = ctx.expr()
+
+        # Check conformance of every saved expected type and its expression asigned.
+        for i, _type in enumerate(_types):
+            _assign = storage.lookupClass(storage.ctxTypes[_expr[i]])
+            _to = storage.lookupClass(_type.getText())
+            if not _to.conforms(_assign):
+                raise myexceptions.DoesNotConform
 
     def exitCall(self, ctx: CoolParser.CallContext):
         _id = ctx.ID().getText()

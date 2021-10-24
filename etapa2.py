@@ -138,8 +138,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test14(self): 
         """
         Dos parámetros con el mismo nombre en el método foo.
@@ -157,6 +155,8 @@ class Nothing():
         with self.assertRaises(DoesNotConform):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test16(self): 
         """
