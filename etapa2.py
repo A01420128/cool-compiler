@@ -174,8 +174,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test18(self): 
         """
         Variable en otro scope.
@@ -184,6 +182,8 @@ class Nothing():
         with self.assertRaises(UndeclaredIdentifier):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test19(self): 
         """

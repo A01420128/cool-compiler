@@ -42,6 +42,13 @@ class ConformanceListener(CoolListener):
             _klass = _new_klass
 
         self.idsTypes = storage.SymbolTableWithScopes(_klass)
+        self.idsTypes.openScope()
+    
+    def exitKlass(self, ctx: CoolParser.KlassContext):
+        self.idsTypes.closeScope()
+    
+    def enterMethod(self, ctx: CoolParser.MethodContext):
+        self.idsTypes.openScope()
     
     def exitMethod(self, ctx: CoolParser.MethodContext):
         _expr = ctx.expr() 
@@ -57,6 +64,8 @@ class ConformanceListener(CoolListener):
 
         if not _typeKlass.conforms(_exprKlass):
             raise myexceptions.DoesNotConform
+        
+        self.idsTypes.closeScope()
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
         _id = ctx.ID().getText()

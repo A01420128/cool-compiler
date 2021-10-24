@@ -107,6 +107,7 @@ class KlassListener(CoolListener):
         storage.ctxTypes[ctx] = 'Object'
 
     def enterLet(self, ctx: CoolParser.LetContext):
+        self.currentKlassTypes.openScope()
         _ids = ctx.ID()
         _types = ctx.TYPE()
         for i in range(len(_ids)):
@@ -119,6 +120,9 @@ class KlassListener(CoolListener):
             storage.ctxTypes[_ids[i]] = _types[i].getText()
             # Add type of identifier for future checks
             self.currentKlassTypes[_ids[i].getText()] = _types[i].getText()
+    
+    def exitLet(self, ctx: CoolParser.LetContext):
+        self.currentKlassTypes.closeScope()
     
     def enterCase(self, ctx: CoolParser.CaseContext):
         # Get all ids and types defined in case.
@@ -234,9 +238,13 @@ class KlassListener(CoolListener):
     def exitObject(self, ctx: CoolParser.ObjectContext):
         # Type rule: Pass type of ID
         _id = ctx.ID().getText()
-        _type = self.currentKlassTypes[_id]
-        storage.ctxTypes[ctx] = _type
-        
+
+        # Check if object is in scope
+        try:
+            _type = self.currentKlassTypes[_id]
+            storage.ctxTypes[ctx] = _type
+        except KeyError:
+            raise myexceptions.UndeclaredIdentifier
     
     def setBaseClasses(self):
         k = storage.Klass('Object')
