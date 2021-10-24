@@ -27,19 +27,26 @@ class KlassListener(CoolListener):
             raise myexceptions.NoMainException
 
     def enterKlass(self, ctx: CoolParser.KlassContext):
-        _types = ctx.TYPE()
+        _klassName = ctx.TYPE()[0].getText()
 
         # Check if klass is redefining basic klasses
-        klassName = _types[0].getText()
-        if klassName in self.baseKlasses:
+        if _klassName in self.baseKlasses:
             raise myexceptions.RedefineBasicClassException
 
+        # Check if klass is being redifined
+        try:
+            _klass = storage.lookupClass(_klassName)
+            if _klass:
+                raise myexceptions.ClassRedefinition
+        except KeyError:
+            pass
+
         # Inheritance is dealt in conformance listener
-        _klass = storage.Klass(klassName)
+        _klass = storage.Klass(_klassName)
         
         # Save current klass
         self.currentKlassTypes = storage.SymbolTableWithScopes(_klass)
-        self.currentKlassTypes['self'] = klassName   
+        self.currentKlassTypes['self'] = _klassName   
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
         _id = ctx.ID().getText()
@@ -269,4 +276,3 @@ class KlassListener(CoolListener):
         self.baseKlasses['Bool'] = k
         k = storage.Klass('SELF_TYPE')
         self.baseKlasses['SELF_TYPE'] = k
-

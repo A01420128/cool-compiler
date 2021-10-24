@@ -183,8 +183,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test19(self): 
         """
         Redefinición de clase A.
@@ -193,6 +191,8 @@ class Nothing():
         with self.assertRaises(ClassRedefinition):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test20(self): 
         """
