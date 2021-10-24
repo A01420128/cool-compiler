@@ -58,9 +58,12 @@ class ConformanceListener(CoolListener):
         if _type == 'SELF_TYPE':
             _type = self.idsTypes.klass.name
 
-        # Check that the result of the method conforms to its type
-        _exprKlass = storage.lookupClass(storage.ctxTypes[_expr])
-        _typeKlass = storage.lookupClass(_type)
+        # Check that the result of the method conforms to its type and that the types exist
+        try:
+            _exprKlass = storage.lookupClass(storage.ctxTypes[_expr])
+            _typeKlass = storage.lookupClass(_type)
+        except KeyError:
+            raise myexceptions.TypeNotFound
 
         if not _typeKlass.conforms(_exprKlass):
             raise myexceptions.DoesNotConform
