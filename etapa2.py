@@ -111,8 +111,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test11(self): 
         """
         Int no tiene método length.
@@ -120,6 +118,7 @@ class Nothing():
         tree = parseCase("badwhilebody")
         with self.assertRaises(MethodNotFound):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test12(self): 
         """
@@ -128,6 +127,9 @@ class Nothing():
         tree = parseCase("badwhilecond")
         with self.assertRaises(TypeCheckMismatch):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test13(self): 
         """
@@ -136,6 +138,7 @@ class Nothing():
         tree = parseCase("caseidenticalbranch")
         with self.assertRaises(InvalidCase):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test14(self): 
         """
@@ -144,6 +147,7 @@ class Nothing():
         tree = parseCase("dupformals")
         with self.assertRaises(KeyError):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test15(self): 
         """
@@ -152,6 +156,7 @@ class Nothing():
         tree = parseCase("letbadinit")
         with self.assertRaises(DoesNotConform):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test16(self): 
         """
@@ -160,6 +165,7 @@ class Nothing():
         tree = parseCase("lubtest")
         with self.assertRaises(DoesNotConform):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test17(self): 
         """
@@ -168,6 +174,7 @@ class Nothing():
         tree = parseCase("missingclass")
         with self.assertRaises(TypeNotFound):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test18(self): 
         """
@@ -176,6 +183,7 @@ class Nothing():
         tree = parseCase("outofscope")
         with self.assertRaises(UndeclaredIdentifier):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test19(self): 
         """
@@ -184,6 +192,7 @@ class Nothing():
         tree = parseCase("redefinedclass")
         with self.assertRaises(ClassRedefinition):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test20(self): 
         """
@@ -192,6 +201,7 @@ class Nothing():
         tree = parseCase("returntypenoexist")
         with self.assertRaises(TypeNotFound):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test21(self): 
         """
@@ -200,6 +210,7 @@ class Nothing():
         tree = parseCase("trickyatdispatch2")
         with self.assertRaises(MethodNotFound):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test22(self): 
         """
@@ -209,6 +220,7 @@ class Nothing():
         tree = parseCase("selftypebadreturn")
         with self.assertRaises(TypeCheckMismatch):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test23(self): 
         """
@@ -217,6 +229,7 @@ class Nothing():
         tree = parseCase("overridingmethod4")
         with self.assertRaises(InvalidMethodOverride):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test24(self): 
         """
@@ -225,6 +238,7 @@ class Nothing():
         tree = parseCase("signaturechange")
         with self.assertRaises(InvalidMethodOverride):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
 if __name__ == '__main__':
     unittest.main()
