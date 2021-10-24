@@ -2,13 +2,14 @@ from collections import MutableMapping, OrderedDict
 import unittest
 
 
-_allClasses = {}
+allClasses = {}
+ctxTypes = None
 
 class HierarchyException(Exception):
     pass
 
 def lookupClass(name):
-    return _allClasses[name]
+    return allClasses[name]
 
 
 class Method():
@@ -39,7 +40,7 @@ class Klass():
 
         self.attributes = SymbolTable()
         self.methods = SymbolTable()
-        _allClasses[name] = self
+        allClasses[name] = self
 
     def validHierarchy(self):
         up = self.inherits
@@ -48,7 +49,7 @@ class Klass():
             # Si encuentro la clase que estoy definiendo -> ciclo
             if up == self.name:
                 raise HierarchyException
-            up = _allClasses[up].inherits
+            up = allClasses[up].inherits
 
     def addAttribute(self, name, type):
         try:
@@ -71,7 +72,7 @@ class Klass():
         elif self.name == "Object":
             raise KeyError(name)
         else:
-            return _allClasses[self.inherits].lookupAttribute(name)
+            return allClasses[self.inherits].lookupAttribute(name)
 
     def lookupMethod(self, name):
         if name in self.methods:
@@ -79,7 +80,7 @@ class Klass():
         elif self.name == "Object":
             raise KeyError(name)
         else:
-            return _allClasses[self.inherits].lookupMethod(name)
+            return allClasses[self.inherits].lookupMethod(name)
 
     def conforms(self, B):
         """
@@ -284,22 +285,22 @@ def setBaseClasses():
     k.addMethod('abort', Method('Object'))
     k.addMethod('type_name', Method('Object'))
     k.addMethod('copy', Method('SELF_TYPE'))
-    _allClasses['Object'] = k
+    allClasses['Object'] = k
     k = Klass('IO')
     k.addMethod('out_string', Method('SELF_TYPE', [('x', 'String')]))
     k.addMethod('out_int', Method('SELF_TYPE', [('x', 'Int')]))
     k.addMethod('in_string', Method('String'))
     k.addMethod('in_int', Method('Int'))
-    _allClasses['IO'] = k
+    allClasses['IO'] = k
     k = Klass('Int')
-    _allClasses['Int'] = k
+    allClasses['Int'] = k
     k = Klass('String')
     k.addMethod('length', Method('Int'))
     k.addMethod('concat', Method('String', [('s', 'String')]))
     k.addMethod('substr', Method('String', [('i', 'Int'), ('l', 'Int')]))
-    _allClasses['String'] = k
+    allClasses['String'] = k
     k = Klass('Bool')
-    _allClasses['String'] = k
+    allClasses['String'] = k
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

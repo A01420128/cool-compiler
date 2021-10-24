@@ -7,6 +7,8 @@ from antlr.CoolLexer import CoolLexer
 from antlr.CoolParser import CoolParser
 from myexceptions import *
 
+from klass_listener import KlassListener
+from conformance_listener import ConformanceListener
 
 def parseCase(caseName):
     parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("input/semantic/%s.cool" % caseName))))
@@ -24,7 +26,8 @@ class CoolTests(unittest.TestCase):
         '''
         tree = parseCase("assignnoconform")
         with self.assertRaises(DoesNotConform):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test2(self): 
         """
@@ -32,7 +35,8 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("attrbadinit")
         with self.assertRaises(UndeclaredIdentifier):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test3(self): 
         """
@@ -40,7 +44,8 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("attroverride")
         with self.assertRaises(NotSupported):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test4(self): 
         """
@@ -49,7 +54,8 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("badargs1")
         with self.assertRaises(DoesNotConform):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test5(self): 
         """
@@ -57,7 +63,8 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("badarith")
         with self.assertRaises(TypeCheckMismatch):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test6(self): 
         """
@@ -65,7 +72,8 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("baddispatch")
         with self.assertRaises(MethodNotFound):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test7(self): 
         """
@@ -73,7 +81,8 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("badequalitytest")
         with self.assertRaises(TypeCheckMismatch):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test8(self): 
         """
@@ -81,7 +90,8 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("badequalitytest2")
         with self.assertRaises(TypeCheckMismatch):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
 
     def test9(self): 
         """
@@ -89,7 +99,11 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("badmethodcallsitself")
         with self.assertRaises(CallTypeCheckMismatch):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
+
 
     def test10(self): 
         """
@@ -97,7 +111,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("badstaticdispatch")
         with self.assertRaises(MethodNotFound):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test11(self): 
         """
@@ -105,7 +119,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("badwhilebody")
         with self.assertRaises(MethodNotFound):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test12(self): 
         """
@@ -113,7 +127,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("badwhilecond")
         with self.assertRaises(TypeCheckMismatch):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test13(self): 
         """
@@ -121,7 +135,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("caseidenticalbranch")
         with self.assertRaises(InvalidCase):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test14(self): 
         """
@@ -129,7 +143,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("dupformals")
         with self.assertRaises(KeyError):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test15(self): 
         """
@@ -137,7 +151,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("letbadinit")
         with self.assertRaises(DoesNotConform):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test16(self): 
         """
@@ -145,7 +159,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("lubtest")
         with self.assertRaises(DoesNotConform):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test17(self): 
         """
@@ -153,7 +167,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("missingclass")
         with self.assertRaises(TypeNotFound):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test18(self): 
         """
@@ -161,7 +175,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("outofscope")
         with self.assertRaises(UndeclaredIdentifier):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test19(self): 
         """
@@ -169,7 +183,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("redefinedclass")
         with self.assertRaises(ClassRedefinition):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test20(self): 
         """
@@ -177,7 +191,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("returntypenoexist")
         with self.assertRaises(TypeNotFound):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test21(self): 
         """
@@ -185,7 +199,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("trickyatdispatch2")
         with self.assertRaises(MethodNotFound):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test22(self): 
         """
@@ -194,7 +208,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("selftypebadreturn")
         with self.assertRaises(TypeCheckMismatch):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test23(self): 
         """
@@ -202,7 +216,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("overridingmethod4")
         with self.assertRaises(InvalidMethodOverride):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
     def test24(self): 
         """
@@ -210,7 +224,7 @@ class CoolTests(unittest.TestCase):
         """
         tree = parseCase("signaturechange")
         with self.assertRaises(InvalidMethodOverride):
-            self.walker.walk(Listener(), tree)
+            self.walker.walk(KlassListener(), tree)
 
 if __name__ == '__main__':
     unittest.main()
