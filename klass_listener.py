@@ -123,12 +123,14 @@ class KlassListener(CoolListener):
             if _ids[i].getText() == 'self':
                 raise myexceptions.SelfVariableException
             
-            # Set expected type of id
-            storage.ctxTypes[_ids[i]] = _types[i].getText()
             # Add type of identifier for future checks
             self.currentKlassTypes[_ids[i].getText()] = _types[i].getText()
     
     def exitLet(self, ctx: CoolParser.LetContext):
+        _expr = ctx.expr()
+        _last = _expr[len(_expr) - 1]
+        _lastType = storage.ctxTypes[_last]
+        storage.ctxTypes[ctx] = _lastType
         self.currentKlassTypes.closeScope()
     
     def enterCase(self, ctx: CoolParser.CaseContext):
