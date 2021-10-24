@@ -165,6 +165,10 @@ class ConformanceListener(CoolListener):
         if _starter == '.':
             _starter_expr = 1
 
+            # If it comes from new get its type
+            if type(_expr[0]) is CoolParser.NewContext:
+                _klassName = _expr[0].TYPE().getText()
+
             # If it comes from a base klass only get it based on the ctx type
             if type(_expr[0]) is CoolParser.BaseContext:
                 _klassName = storage.ctxTypes[_expr[0]]

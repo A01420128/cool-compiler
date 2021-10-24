@@ -1,7 +1,6 @@
 from collections import MutableMapping, OrderedDict
 import unittest
 
-
 allClasses = {}
 ctxTypes = None
 
