@@ -283,6 +283,10 @@ class ConformanceListener(CoolListener):
                 _let = _expr[0]
                 _caller = _let.getChild(_let.getChildCount() - 1) # Last expr in let
                 _klassName = storage.ctxTypes[_caller]
+
+            # Try getting it with the type in the expression
+            if _klassName == None:
+                _klassName = storage.ctxTypes[_expr[0]]
             
         elif _starter == '(':
             _starter_expr = 0

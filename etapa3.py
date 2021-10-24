@@ -80,14 +80,8 @@ cases = ['simplearith',
 if __name__ == '__main__':
     methods = {}
     i = 0
-    # for i in range(len(cases)):
-    for i in range(37):
-        print(f'doing {i} : {cases[i]}')
-        methods['test%d' % i] = lambda self: self.assertTrue(parseAndCompare(cases[i]))
-    """
     for caso in cases:
         methods['test%d' % i] = lambda self: self.assertTrue(parseAndCompare(caso))
         i = i+1
-    """
     CoolTests = type('CoolTests', (BaseTest,), methods)
     unittest.main()
