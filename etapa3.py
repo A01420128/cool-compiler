@@ -81,7 +81,7 @@ if __name__ == '__main__':
     methods = {}
     i = 0
     # for i in range(len(cases)):
-    for i in range(9):
+    for i in range(12):
         print(f'doing {i} : {cases[i]}')
         methods['test%d' % i] = lambda self: self.assertTrue(parseAndCompare(cases[i]))
     """

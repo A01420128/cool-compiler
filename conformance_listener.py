@@ -199,8 +199,8 @@ class ConformanceListener(CoolListener):
         for i, _expected_type in enumerate(_method.params.values()):
             _inserted_type = storage.ctxTypes[_expr[_starter_expr + i]]
 
-            # Catch self types
-            if _inserted_type == 'self':
+            # Catch self types and SELF_TYPE
+            if _inserted_type == 'self' or _inserted_type == 'SELF_TYPE':
                 _inserted_type = self.idsTypes.klass.name
 
             # Method calls with badmethodcallsitself
