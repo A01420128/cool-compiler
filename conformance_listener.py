@@ -38,6 +38,21 @@ class ConformanceListener(CoolListener):
 
         self.idsTypes = storage.SymbolTableWithScopes(_klass)
     
+    def exitMethod(self, ctx: CoolParser.MethodContext):
+        _expr = ctx.expr() 
+        _type = ctx.TYPE().getText()
+
+        # SELF_TYPE sets type to the current klass, no matter if its inherited
+        if _type == 'SELF_TYPE':
+            _type = self.idsTypes.klass.name
+
+        # Check that the result of the method conforms to its type
+        _exprKlass = storage.lookupClass(storage.ctxTypes[_expr])
+        _typeKlass = storage.lookupClass(_type)
+
+        if not _typeKlass.conforms(_exprKlass):
+            raise myexceptions.DoesNotConform
+    
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
         _id = ctx.ID().getText()
         _type = ctx.TYPE().getText()
@@ -54,6 +69,17 @@ class ConformanceListener(CoolListener):
 
         # Save id typE
         self.idsTypes[_id] = _type
+    
+    def exitIf(self, ctx: CoolParser.IfContext):
+        # Type Rule: The union of the two branches
+        _trueType = storage.ctxTypes[ctx.expr()[1]]
+        _falseType = storage.ctxTypes[ctx.expr()[2]]
+
+        _trueKlass = storage.lookupClass(_trueType)
+        _falseKlass = storage.lookupClass(_falseType)
+        _union = _trueKlass.union(_falseKlass)
+
+        storage.ctxTypes[ctx] = _union
 
     def enterLet(self, ctx: CoolParser.LetContext):
         _types = ctx.TYPE()
@@ -65,6 +91,13 @@ class ConformanceListener(CoolListener):
             _to = storage.lookupClass(_type.getText())
             if not _to.conforms(_assign):
                 raise myexceptions.DoesNotConform
+    
+    def exitBlock(self, ctx: CoolParser.BlockContext):
+        # Type Rule: Pass type of last expr
+        _expr = ctx.expr()
+        _last = storage.ctxTypes[_expr[len(_expr) - 1]]
+        storage.ctxTypes[ctx] = _last
+        
 
     def exitCall(self, ctx: CoolParser.CallContext):
         _id = ctx.ID().getText()

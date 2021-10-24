@@ -102,6 +102,9 @@ class KlassListener(CoolListener):
         # First expression should be a boolean
         if storage.ctxTypes[ctx.expr()[0]] != 'Bool':
             raise myexceptions.TypeCheckMismatch
+        
+        # Type Rule: Pass object
+        storage.ctxTypes[ctx] = 'Object'
 
     def enterLet(self, ctx: CoolParser.LetContext):
         _ids = ctx.ID()

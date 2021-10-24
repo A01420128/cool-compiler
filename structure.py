@@ -88,12 +88,20 @@ class Klass():
         un objeto de tipo B? De otro modo, es B de la misma clase que self o
         más particular?
         """
+        if B.name == self.name: # Antes porque object conforms to object
+            return True
         if B.name == 'Object':
             return False
-        if B.name == self.name:
-            return True
         else:
             return self.conforms(lookupClass(B.inherits))
+    
+    def union(self, B):
+        """
+        self U B, returns at which point do these two klasses meet.
+        """
+        if B.conforms(self):
+            return B.name
+        return self.union(lookupClass(B.inherits))
         
 class SymbolTable(MutableMapping):
     """

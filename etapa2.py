@@ -156,8 +156,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test16(self): 
         """
         Pruebas con el operador de conformidad.
@@ -166,6 +164,8 @@ class Nothing():
         with self.assertRaises(DoesNotConform):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test17(self): 
         """
