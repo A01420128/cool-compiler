@@ -94,24 +94,11 @@ class KlassListener(CoolListener):
             raise myexceptions.SelftypeInvalidUseException
         
         self.currentKlassTypes[id] = _type
-    
+
     def exitFormal(self, ctx: CoolParser.FormalContext):
         # Type rule: Pass TYPE()
         _type = ctx.TYPE().getText()
         storage.ctxTypes[ctx] = _type
-    
-    def exitBase(self, ctx: CoolParser.BaseContext):
-        # Type Rule: Pass child type
-        _type = storage.ctxTypes[ctx.getChild(0)]
-        storage.ctxTypes[ctx] = _type
-    
-    def exitWhile(self, ctx: CoolParser.WhileContext):
-        # First expression should be a boolean
-        if storage.ctxTypes[ctx.expr()[0]] != 'Bool':
-            raise myexceptions.TypeCheckMismatch
-        
-        # Type Rule: Pass object
-        storage.ctxTypes[ctx] = 'Object'
 
     def enterLet(self, ctx: CoolParser.LetContext):
         self.currentKlassTypes.openScope()
@@ -127,10 +114,6 @@ class KlassListener(CoolListener):
             self.currentKlassTypes[_ids[i].getText()] = _types[i].getText()
     
     def exitLet(self, ctx: CoolParser.LetContext):
-        _expr = ctx.expr()
-        _last = _expr[len(_expr) - 1]
-        _lastType = storage.ctxTypes[_last]
-        storage.ctxTypes[ctx] = _lastType
         self.currentKlassTypes.closeScope()
     
     def enterCase(self, ctx: CoolParser.CaseContext):
@@ -151,103 +134,10 @@ class KlassListener(CoolListener):
             _saved.add(_type)
             self.currentKlassTypes[_id.getText()] = _types[i].getText()
     
-    def exitNew(self, ctx: CoolParser.NewContext):
-        # Type Rule: Pass type in rule
-        _type = ctx.TYPE().getText()
-        storage.ctxTypes[ctx] = _type
-
-    def exitMult(self, ctx: CoolParser.MultContext):
-        # Type rule: both expr should be Int, pass Int
-        _left = ctx.getChild(0)
-        _right = ctx.getChild(2)
-        if (storage.ctxTypes[_left] != 'Int' or storage.ctxTypes[_right] != 'Int'):
-            raise myexceptions.TypeCheckMismatch
-        else:  
-            storage.ctxTypes[ctx] = 'Int'
-
-    def exitDiv(self, ctx: CoolParser.DivContext):
-        # Type rule: both expr should be Int, pass Int
-        _left = ctx.getChild(0)
-        _right = ctx.getChild(2)
-        if (storage.ctxTypes[_left] != 'Int' or storage.ctxTypes[_right] != 'Int'):
-            raise myexceptions.TypeCheckMismatch
-        else:  
-            storage.ctxTypes[ctx] = 'Int'
-
-    def exitAdd(self, ctx: CoolParser.AddContext):
-        # Type rule: both expr should be Int, pass Int
-        _left = ctx.getChild(0)
-        _right = ctx.getChild(2)
-        if (storage.ctxTypes[_left] != 'Int' or storage.ctxTypes[_right] != 'Int'):
-            raise myexceptions.TypeCheckMismatch
-        else:  
-            storage.ctxTypes[ctx] = 'Int'
-
-    def exitSub(self, ctx: CoolParser.SubContext):
-        # Type rule: both expr should be Int, pass Int
-        _left = ctx.getChild(0)
-        _right = ctx.getChild(2)
-        if (storage.ctxTypes[_left] != 'Int' or storage.ctxTypes[_right] != 'Int'):
-            raise myexceptions.TypeCheckMismatch
-        else:  
-            storage.ctxTypes[ctx] = 'Int'
-
-    def exitLt(self, ctx: CoolParser.LtContext):
-        # Type rule: both expr should be Int, pass Bool
-        _left = ctx.getChild(0)
-        _right = ctx.getChild(2)
-        if (storage.ctxTypes[_left] != 'Int' or storage.ctxTypes[_right] != 'Int'):
-            raise myexceptions.TypeCheckMismatch
-        else:  
-            storage.ctxTypes[ctx] = 'Bool'
-
-    def exitLe(self, ctx: CoolParser.LeContext):
-        # Type rule: both expr should be Int, pass Bool
-        _left = ctx.getChild(0)
-        _right = ctx.getChild(2)
-        if (storage.ctxTypes[_left] != 'Int' or storage.ctxTypes[_right] != 'Int'):
-            raise myexceptions.TypeCheckMismatch
-        else:  
-            storage.ctxTypes[ctx] = 'Bool'
-
-    def exitEq(self, ctx: CoolParser.EqContext):
-        # Type rule: compare freely except if type Int, String or Bool, compare to same.
-        _expr = ctx.expr()
-        _left = storage.ctxTypes[_expr[0]]
-        _right = storage.ctxTypes[_expr[1]]
-        _except = ['Int', 'String', 'Bool']
-        if _left in _except or _right in _except:
-            if _left != _right:
-                raise myexceptions.TypeCheckMismatch
-
-        storage.ctxTypes[ctx] = 'Bool'
-    
-    def exitNot(self, ctx: CoolParser.NotContext):
-        # Type rule: expr should be Bool, pass Bool
-        if storage.ctxTypes[ctx.expr()] == 'Bool':
-            storage.ctxTypes[ctx] = 'Bool'
-
     def enterAssign(self, ctx: CoolParser.AssignContext):
         # No id is self in assign
         if ctx.ID().getText() == 'self':
             raise myexceptions.SelfAssignmentException
-    
-    def exitParens(self, ctx: CoolParser.ParensContext):
-        # Type rule: Pass expr context
-        _type = storage.ctxTypes[ctx.expr()]
-        storage.ctxTypes[ctx] = _type
-    
-    def exitInteger(self, ctx: CoolParser.IntegerContext):
-        # Type rule: Pass 'Int'
-        storage.ctxTypes[ctx] = 'Int'
-    
-    def exitString(self, ctx: CoolParser.StringContext):
-        # Type rule: Pass 'String'
-        storage.ctxTypes[ctx] = 'String'
-    
-    def exitBool(self, ctx: CoolParser.BoolContext):
-        # Type rule: Pass 'Bool'
-        storage.ctxTypes[ctx] = 'Bool'
     
     def exitObject(self, ctx: CoolParser.ObjectContext):
         # Type rule: Pass type of ID

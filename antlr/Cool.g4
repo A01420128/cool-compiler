@@ -39,6 +39,7 @@ expr
     | expr '<=' expr    #le
     | expr '=' expr     #eq
     | 'not' expr        #not
+    | '~' expr          #neg
     | <assoc=right> ID '<-' expr    #assign
     ;
 
