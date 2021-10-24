@@ -201,8 +201,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test21(self): 
         """
         No se puede hacer @ de A a B.
@@ -221,6 +219,8 @@ class Nothing():
         with self.assertRaises(TypeCheckMismatch):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test23(self): 
         """

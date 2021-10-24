@@ -54,19 +54,23 @@ class ConformanceListener(CoolListener):
         _expr = ctx.expr() 
         _type = ctx.TYPE().getText()
 
-        # SELF_TYPE sets type to the current klass, no matter if its inherited
+        # Check if methods expects a SELF_TYPE
         if _type == 'SELF_TYPE':
+            # SELF_TYPE sets type to the current klass, no matter if its inherited
             _type = self.idsTypes.klass.name
+            # SELF_TYPE requires a dynamic expr type
+            if storage.ctxTypes[_expr] != 'self':
+                raise myexceptions.TypeCheckMismatch
+        else:
+            # Check that the result of the method conforms to its type and that the types exist
+            try:
+                _exprKlass = storage.lookupClass(storage.ctxTypes[_expr])
+                _typeKlass = storage.lookupClass(_type)
+            except KeyError:
+                raise myexceptions.TypeNotFound
 
-        # Check that the result of the method conforms to its type and that the types exist
-        try:
-            _exprKlass = storage.lookupClass(storage.ctxTypes[_expr])
-            _typeKlass = storage.lookupClass(_type)
-        except KeyError:
-            raise myexceptions.TypeNotFound
-
-        if not _typeKlass.conforms(_exprKlass):
-            raise myexceptions.DoesNotConform
+            if not _typeKlass.conforms(_exprKlass):
+                raise myexceptions.DoesNotConform
         
         self.idsTypes.closeScope()
     
@@ -157,6 +161,10 @@ class ConformanceListener(CoolListener):
         for i, _expected_type in enumerate(_method.params.values()):
             _inserted_type = storage.ctxTypes[_expr[_starter_expr + i]]
 
+            # Catch self types
+            if _inserted_type == 'self':
+                _inserted_type = self.idsTypes.klass.name
+
             # Method calls with badmethodcallsitself
             # Test4 y test6 de etapa2 evaluan que los argumentos sean del mismo tipo
             # esto hace que las exceptiones arrojadas sean diferentes, por eso hacemos
@@ -179,9 +187,15 @@ class ConformanceListener(CoolListener):
         _expr = ctx.expr()
         _type = ctx.TYPE()
 
-        _left = storage.lookupClass(storage.ctxTypes[_expr[0]])
+        # Catch self types
+        _leftType = storage.ctxTypes[_expr[0]]
+        if _leftType == 'self':
+            _leftType = self.idsTypes.klass.name
+
+        _left = storage.lookupClass(_leftType)
         _right = storage.lookupClass(_type.getText())
 
+        # Rigth should conform left.
         if not _right.conforms(_left):
             raise myexceptions.MethodNotFound
 

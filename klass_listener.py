@@ -46,7 +46,7 @@ class KlassListener(CoolListener):
         
         # Save current klass
         self.currentKlassTypes = storage.SymbolTableWithScopes(_klass)
-        self.currentKlassTypes['self'] = _klassName   
+        self.currentKlassTypes['self'] = 'self'
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
         _id = ctx.ID().getText()
