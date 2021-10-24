@@ -10,7 +10,7 @@ import structure as storage
 class KlassListener(CoolListener):
 
     def __init__(self):
-        self.currentKlassTypes = None
+        self.currentKlass = None
         self.baseKlasses = storage.SymbolTable()
 
         # Reset st.classes so that it doesnt save other file klasses
@@ -43,10 +43,9 @@ class KlassListener(CoolListener):
 
         # Inheritance is dealt in conformance listener
         _klass = storage.Klass(_klassName)
-        
+
         # Save current klass
-        self.currentKlassTypes = storage.SymbolTableWithScopes(_klass)
-        self.currentKlassTypes['self'] = 'self'
+        self.currentKlass = _klass
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
         _id = ctx.ID().getText()
@@ -56,22 +55,10 @@ class KlassListener(CoolListener):
         if _id == 'self':
             raise myexceptions.SelfVariableException
 
-        # An attributed cant be assigned an uknown variable.
-        expr = ctx.expr()
-        if expr:
-            if hasattr(expr.getChild(0), 'ID'):
-                expr_id = expr.getChild(0).ID().getText()
-                try:
-                    self.currentKlassTypes[expr_id]
-                except KeyError as e:
-                    raise myexceptions.UndeclaredIdentifier
-
-        self.currentKlassTypes.klass.addAttribute(_id, _type)
-        self.currentKlassTypes[_id] = _type
+        self.currentKlass.addAttribute(_id, _type)
 
     def enterMethod(self, ctx: CoolParser.MethodContext):
         storage.ctxTypes[ctx] = ctx.TYPE().getText()
-        self.currentKlassTypes.openScope()
 
     def exitMethod(self, ctx: CoolParser.MethodContext):
         # Add method and its formals to the current klass
@@ -81,74 +68,12 @@ class KlassListener(CoolListener):
         _params = []
         for _formal in _formals:
             _params.append((_formal.ID().getText(), storage.ctxTypes[_formal]))
-        self.currentKlassTypes.klass.addMethod(name, storage.Method(_type, _params))
-        self.currentKlassTypes.closeScope()
+        self.currentKlass.addMethod(name, storage.Method(_type, _params))
     
-    def enterFormal(self, ctx: CoolParser.FormalContext):
-        id = ctx.ID().getText()
-        _type = ctx.TYPE().getText()
-        if id == 'self':
-            raise myexceptions.SelfVariableException
-        
-        if _type == 'SELF_TYPE':
-            raise myexceptions.SelftypeInvalidUseException
-        
-        self.currentKlassTypes[id] = _type
-
     def exitFormal(self, ctx: CoolParser.FormalContext):
         # Type rule: Pass TYPE()
         _type = ctx.TYPE().getText()
         storage.ctxTypes[ctx] = _type
-
-    def enterLet(self, ctx: CoolParser.LetContext):
-        self.currentKlassTypes.openScope()
-        _ids = ctx.ID()
-        _types = ctx.TYPE()
-        for i in range(len(_ids)):
-
-            # No id should be self
-            if _ids[i].getText() == 'self':
-                raise myexceptions.SelfVariableException
-            
-            # Add type of identifier for future checks
-            self.currentKlassTypes[_ids[i].getText()] = _types[i].getText()
-    
-    def exitLet(self, ctx: CoolParser.LetContext):
-        self.currentKlassTypes.closeScope()
-    
-    def enterCase(self, ctx: CoolParser.CaseContext):
-        # Get all ids and types defined in case.
-        _ids = ctx.ID()
-        _types = ctx.TYPE()
-
-        # There should not be repeated types
-        _saved = set()
-        for i, _id in enumerate(_ids):
-            _type = _types[i].getText()
-
-            # Check type is not repeated
-            if _type in _saved:
-                raise myexceptions.InvalidCase
-
-            # Save the types of all ids defined
-            _saved.add(_type)
-            self.currentKlassTypes[_id.getText()] = _types[i].getText()
-    
-    def enterAssign(self, ctx: CoolParser.AssignContext):
-        # No id is self in assign
-        if ctx.ID().getText() == 'self':
-            raise myexceptions.SelfAssignmentException
-    
-    def exitObject(self, ctx: CoolParser.ObjectContext):
-        # Type rule: Pass type of ID
-        _id = ctx.ID().getText()
-
-        # Check if object is in scope
-        try:
-            _type = self.currentKlassTypes[_id]
-            storage.ctxTypes[ctx] = _type
-        except KeyError:
-            raise myexceptions.UndeclaredIdentifier
     
     def setBaseClasses(self):
         k = storage.Klass('Object')
