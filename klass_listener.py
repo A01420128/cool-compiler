@@ -1,4 +1,5 @@
 from typing import KeysView
+from unittest.main import main
 from antlr.CoolListener import CoolListener
 from antlr.CoolParser import CoolParser
 
@@ -98,7 +99,7 @@ class KlassListener(CoolListener):
         storage.ctxTypes[ctx] = _type
     
     def exitWhile(self, ctx: CoolParser.WhileContext):
-        # First expression should be a while
+        # First expression should be a boolean
         if storage.ctxTypes[ctx.expr()[0]] != 'Bool':
             raise myexceptions.TypeCheckMismatch
 
@@ -115,6 +116,24 @@ class KlassListener(CoolListener):
             storage.ctxTypes[_ids[i]] = _types[i].getText()
             # Add type of identifier for future checks
             self.currentKlassTypes[_ids[i].getText()] = _types[i].getText()
+    
+    def enterCase(self, ctx: CoolParser.CaseContext):
+        # Get all ids and types defined in case.
+        _ids = ctx.ID()
+        _types = ctx.TYPE()
+
+        # There should not be repeated types
+        _saved = set()
+        for i, _id in enumerate(_ids):
+            _type = _types[i].getText()
+
+            # Check type is not repeated
+            if _type in _saved:
+                raise myexceptions.InvalidCase
+
+            # Save the types of all ids defined
+            _saved.add(_type)
+            self.currentKlassTypes[_id.getText()] = _types[i].getText()
     
     def exitNew(self, ctx: CoolParser.NewContext):
         # Type Rule: Pass type in rule

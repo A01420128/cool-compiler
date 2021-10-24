@@ -129,8 +129,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test13(self): 
         """
         Dos ramas de case tienen el mismo tipo.
@@ -139,6 +137,8 @@ class Nothing():
         with self.assertRaises(InvalidCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test14(self): 
         """
