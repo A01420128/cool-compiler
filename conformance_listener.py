@@ -57,16 +57,21 @@ class ConformanceListener(CoolListener):
             # Look for posible overrides
             try:
                 _inheritedMethod = _inheritedklass.lookupMethod(_methodName)
+                # Should be the same return type
+                if _inheritedMethod.type != ctx.TYPE().getText():
+                    raise myexceptions.InvalidMethodOverride
+
+                # Should have the same number of arguments
                 _inheritedFormals = _inheritedMethod.params
                 _formals = ctx.formal()
-                # Every new formal should be the same, same amount too.
+                if len(_inheritedFormals) != len(_formals):
+                    raise myexceptions.InvalidMethodOverride
+
+                # Every new formal should be the same
                 for i, (k, v) in enumerate(_inheritedFormals.items()):
-                    try:
-                        _new_id = _formals[i].ID().getText()
-                        _new_type = _formals[i].TYPE().getText()
-                        if _new_id != k or _new_type != v:
-                            raise myexceptions.InvalidMethodOverride
-                    except IndexError:
+                    _new_id = _formals[i].ID().getText()
+                    _new_type = _formals[i].TYPE().getText()
+                    if _new_id != k or _new_type != v:
                         raise myexceptions.InvalidMethodOverride
             except KeyError:
                 pass
@@ -88,7 +93,12 @@ class ConformanceListener(CoolListener):
         else:
             # Check that the result of the method conforms to its type and that the types exist
             try:
-                _exprKlass = storage.lookupClass(storage.ctxTypes[_expr])
+                # Check for self
+                _exprType = storage.ctxTypes[_expr]
+                if _exprType == 'self':
+                    _exprType = self.idsTypes.klass.name
+
+                _exprKlass = storage.lookupClass(_exprType)
                 _typeKlass = storage.lookupClass(_type)
             except KeyError:
                 raise myexceptions.TypeNotFound

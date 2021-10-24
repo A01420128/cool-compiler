@@ -229,8 +229,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test24(self): 
         """
         Se intenta cambiar la firma de un método.
