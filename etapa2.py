@@ -165,8 +165,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test17(self): 
         """
         Heredar de una clase inexistente.
@@ -175,6 +173,8 @@ class Nothing():
         with self.assertRaises(TypeNotFound):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test18(self): 
         """

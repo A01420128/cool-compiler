@@ -30,7 +30,12 @@ class ConformanceListener(CoolListener):
             _prev_methods = _klass.methods
 
             # Save same klass but now with inheritance
-            storage.Klass(_klassName, inherits=_inherit)
+            # Check that the inherited klass exists.
+            try:
+                storage.Klass(_klassName, inherits=_inherit)
+            except KeyError:
+                raise myexceptions.TypeNotFound
+
             _new_klass = storage.lookupClass(_klassName)
             _new_klass.attributes = _prev_attr
             _new_klass.methods = _prev_methods
