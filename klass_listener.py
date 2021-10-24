@@ -219,6 +219,11 @@ class KlassListener(CoolListener):
                 raise myexceptions.TypeCheckMismatch
 
         storage.ctxTypes[ctx] = 'Bool'
+    
+    def exitNot(self, ctx: CoolParser.NotContext):
+        # Type rule: expr should be Bool, pass Bool
+        if storage.ctxTypes[ctx.expr()] == 'Bool':
+            storage.ctxTypes[ctx] = 'Bool'
 
     def enterAssign(self, ctx: CoolParser.AssignContext):
         # No id is self in assign
