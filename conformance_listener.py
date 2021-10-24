@@ -304,8 +304,9 @@ class ConformanceListener(CoolListener):
         storage.ctxTypes[ctx] = _method.type
         
     def exitAt(self, ctx: CoolParser.AtContext):
+        _id = ctx.ID().getText()
         _expr = ctx.expr()
-        _type = ctx.TYPE()
+        _type = ctx.TYPE().getText()
 
         # Catch self types
         _leftType = storage.ctxTypes[_expr[0]]
@@ -313,11 +314,16 @@ class ConformanceListener(CoolListener):
             _leftType = self.idsTypes.klass.name
 
         _left = storage.lookupClass(_leftType)
-        _right = storage.lookupClass(_type.getText())
+        _right = storage.lookupClass(_type)
 
-        # Rigth should conform left.
+        # Right should conform left.
         if not _right.conforms(_left):
             raise myexceptions.MethodNotFound
+        
+        # Type Rule: Pass type of the method being called
+        _methodType = _right.lookupMethod(_id).type
+        # Type Rule: Same as right side. Validate later.
+        storage.ctxTypes[ctx] = _methodType
 
     def exitNeg(self, ctx: CoolParser.NegContext):
         # Type Rule: if expr is Int, pass Int
