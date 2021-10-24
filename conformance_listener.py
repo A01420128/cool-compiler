@@ -324,7 +324,12 @@ class ConformanceListener(CoolListener):
                 raise myexceptions.DoesNotConform
         
         # Type Rule: The type for the method called
-        storage.ctxTypes[ctx] = _method.type
+        _calltype = _method.type
+        # Set call type to _klass caller when SELF_TYPE
+        if _method.type == 'SELF_TYPE':
+            _calltype = _klass.name
+
+        storage.ctxTypes[ctx] = _calltype
         for _ex in _expr:
             self.idsTypes.closeScope()
         
@@ -511,6 +516,8 @@ class ConformanceListener(CoolListener):
 
     def exitAssign(self, ctx: CoolParser.AssignContext):
         # Check conformance of types
+        _id = ctx.ID().getText()
+        _expr = ctx.expr()
         _idType = self.idsTypes[ctx.ID().getText()]
         _exprType = storage.ctxTypes[ctx.expr()]
         _idKlass = storage.lookupClass(_idType)
