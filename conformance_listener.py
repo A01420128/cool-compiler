@@ -13,9 +13,29 @@ class ConformanceListener(CoolListener):
         self.idsTypes = None
 
     def enterKlass(self, ctx: CoolParser.KlassContext):
+        _types = ctx.TYPE()
+
         # Start an ids symbol table in the current klass
         _klassName = ctx.TYPE()[0].getText()
         _klass = storage.lookupClass(_klassName)
+
+        # Now we deal with inheritance
+        if len(_types) > 1:
+            _inherit = _types[1].getText()
+            if _inherit in ['Bool', 'SELF_TYPE', 'String']:
+                raise myexceptions.InvalidInheritsException
+            
+            # Save previous attributes and methods
+            _prev_attr = _klass.attributes
+            _prev_methods = _klass.methods
+
+            # Save same klass but now with inheritance
+            storage.Klass(_klassName, inherits=_inherit)
+            _new_klass = storage.lookupClass(_klassName)
+            _new_klass.attributes = _prev_attr
+            _new_klass.methods = _prev_methods
+            _klass = _new_klass
+
         self.idsTypes = storage.SymbolTableWithScopes(_klass)
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
@@ -27,7 +47,7 @@ class ConformanceListener(CoolListener):
             _klass = self.idsTypes.klass
             _inherited = storage.lookupClass(_klass.inherits)
             _found = _inherited.lookupAttribute(_id)
-            if _found: 
+            if _found != _type:
                 raise myexceptions.NotSupported
         except KeyError:
             pass
@@ -95,6 +115,16 @@ class ConformanceListener(CoolListener):
         # Type Rule: The type for the method called
         storage.ctxTypes[ctx] = _method.type
         
+    def exitAt(self, ctx: CoolParser.AtContext):
+        _expr = ctx.expr()
+        _type = ctx.TYPE()
+
+        _left = storage.lookupClass(storage.ctxTypes[_expr[0]])
+        _right = storage.lookupClass(_type.getText())
+
+        if not _right.conforms(_left):
+            raise myexceptions.MethodNotFound
+
 
     def enterAssign(self, ctx: CoolParser.AssignContext):
         # Check conformance of types

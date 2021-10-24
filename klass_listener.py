@@ -33,17 +33,8 @@ class KlassListener(CoolListener):
         if klassName in self.baseKlasses:
             raise myexceptions.RedefineBasicClassException
 
-        # Check if klass inherits or not
-        _klass = None
-        if len(_types) > 1:
-            _inherit= _types[1].getText()
-            if _inherit in ['Bool', 'SELF_TYPE', 'String']:
-                raise myexceptions.InvalidInheritsException
-            
-            # Save klass in store
-            _klass =storage.Klass(klassName, inherits=_inherit)
-        else:
-            _klass = storage.Klass(klassName)
+        # Inheritance is dealt in conformance listener
+        _klass = storage.Klass(klassName)
         
         # Save current klass
         self.currentKlassTypes = storage.SymbolTableWithScopes(_klass)

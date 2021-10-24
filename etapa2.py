@@ -102,9 +102,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
-
     def test10(self): 
         """
         El método bar está en un tipo más especializado, no se puede usar @.
@@ -112,6 +109,9 @@ class Nothing():
         tree = parseCase("badstaticdispatch")
         with self.assertRaises(MethodNotFound):
             self.walker.walk(KlassListener(), tree)
+            self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test11(self): 
         """
