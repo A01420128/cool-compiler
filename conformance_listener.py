@@ -13,34 +13,10 @@ class ConformanceListener(CoolListener):
         self.idsTypes = None
 
     def enterKlass(self, ctx: CoolParser.KlassContext):
-        _types = ctx.TYPE()
-
-        # Start an ids symbol table in the current klass
         _klassName = ctx.TYPE()[0].getText()
         _klass = storage.lookupClass(_klassName)
 
-        # Now we deal with inheritance
-        if len(_types) > 1:
-            _inherit = _types[1].getText()
-            if _inherit in ['Bool', 'SELF_TYPE', 'String']:
-                raise myexceptions.InvalidInheritsException
-            
-            # Save previous attributes and methods
-            _prev_attr = _klass.attributes
-            _prev_methods = _klass.methods
-
-            # Save same klass but now with inheritance
-            # Check that the inherited klass exists.
-            try:
-                storage.Klass(_klassName, inherits=_inherit)
-            except KeyError:
-                raise myexceptions.TypeNotFound
-
-            _new_klass = storage.lookupClass(_klassName)
-            _new_klass.attributes = _prev_attr
-            _new_klass.methods = _prev_methods
-            _klass = _new_klass
-
+        # Start an ids symbol table in the current klass
         self.idsTypes = storage.SymbolTableWithScopes(_klass)
         self.idsTypes.openScope()
         self.idsTypes['self'] = 'self'

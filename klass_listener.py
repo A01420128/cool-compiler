@@ -12,6 +12,7 @@ class KlassListener(CoolListener):
     def __init__(self):
         self.currentKlass = None
         self.baseKlasses = storage.SymbolTable()
+        self.pending_inheritance = dict()
 
         # Reset st.classes so that it doesnt save other file klasses
         storage.allClasses = {}
@@ -25,9 +26,31 @@ class KlassListener(CoolListener):
             storage.lookupClass('Main').lookupMethod('main')
         except KeyError as e:
             raise myexceptions.NoMainException
+        
+        # Fix inheritance now that the whole hierarchy is present
+        for _name, _inherits in self.pending_inheritance.items():
+            # Save previous attributes and methods
+            _klass = storage.lookupClass(_name)
+            _prev_attr = _klass.attributes
+            _prev_methods = _klass.methods
+
+            # Save same klass but now with inheritance,
+            # check that the inherited klass exists.
+            try:
+                storage.Klass(_name, inherits=_inherits)
+            except KeyError:
+                raise myexceptions.TypeNotFound
+            
+            # Restore attributes and methods
+            _new_klass = storage.lookupClass(_name)
+            _new_klass.attributes = _prev_attr
+            _new_klass.methods = _prev_methods
+
+
 
     def enterKlass(self, ctx: CoolParser.KlassContext):
-        _klassName = ctx.TYPE()[0].getText()
+        _types = ctx.TYPE()
+        _klassName = _types[0].getText()
 
         # Check if klass is redefining basic klasses
         if _klassName in self.baseKlasses:
@@ -41,10 +64,21 @@ class KlassListener(CoolListener):
         except KeyError:
             pass
 
-        # Inheritance is dealt in conformance listener
-        _klass = storage.Klass(_klassName)
+        # Inheritance is dealt at exit given thatr validHierarchy in store is
+        # preventing assigning inheritance without validating.
+        # It is done on exit so that conformance listener has everything ready
+        if len(_types) > 1:
+            _inherit = _types[1].getText()
 
-        # Save current klass
+            # Check inheritance is not of these types.
+            if _inherit in ['Bool', 'SELF_TYPE', 'String']:
+                raise myexceptions.InvalidInheritsException
+            
+            # Save pending rearranging of inheritance after program exits.
+            self.pending_inheritance[_klassName] = _inherit
+            
+        # Save klass
+        _klass = storage.Klass(_klassName)
         self.currentKlass = _klass
     
     def enterAtribute(self, ctx: CoolParser.AtributeContext):
