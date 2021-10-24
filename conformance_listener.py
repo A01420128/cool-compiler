@@ -48,6 +48,30 @@ class ConformanceListener(CoolListener):
         self.idsTypes.closeScope()
     
     def enterMethod(self, ctx: CoolParser.MethodContext):
+        _methodName = ctx.ID().getText()
+
+        # Check for bad override of inherited methods
+        _inherits = self.idsTypes.klass.inherits
+        if _inherits:
+            _inheritedklass = storage.lookupClass(_inherits)
+            # Look for posible overrides
+            try:
+                _inheritedMethod = _inheritedklass.lookupMethod(_methodName)
+                _inheritedFormals = _inheritedMethod.params
+                _formals = ctx.formal()
+                # Every new formal should be the same, same amount too.
+                for i, (k, v) in enumerate(_inheritedFormals.items()):
+                    try:
+                        _new_id = _formals[i].ID().getText()
+                        _new_type = _formals[i].TYPE().getText()
+                        if _new_id != k or _new_type != v:
+                            raise myexceptions.InvalidMethodOverride
+                    except IndexError:
+                        raise myexceptions.InvalidMethodOverride
+            except KeyError:
+                pass
+
+
         self.idsTypes.openScope()
     
     def exitMethod(self, ctx: CoolParser.MethodContext):

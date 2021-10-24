@@ -220,8 +220,6 @@ class CoolTests(unittest.TestCase):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
 
-class Nothing():
-
     def test23(self): 
         """
         Se intenta redefinir un método cambiando los parámetros.
@@ -230,6 +228,8 @@ class Nothing():
         with self.assertRaises(InvalidMethodOverride):
             self.walker.walk(KlassListener(), tree)
             self.walker.walk(ConformanceListener(), tree)
+
+class Nothing():
 
     def test24(self): 
         """
