@@ -10,6 +10,16 @@ class HierarchyException(Exception):
 def lookupClass(name):
     return allClasses[name]
 
+def union_mult(A, Blist):
+    """
+    A U B, returns at which point do these klasses meet.
+    """
+    for B in Blist:
+        _bklass = lookupClass(B)
+        if not A.conforms(_bklass):
+            return union_mult(lookupClass(A.inherits), Blist)
+    return A.name
+
 
 class Method():
     """
@@ -101,6 +111,7 @@ class Klass():
         if B.conforms(self):
             return B.name
         return self.union(lookupClass(B.inherits))
+    
         
 class SymbolTable(MutableMapping):
     """

@@ -224,6 +224,13 @@ class ConformanceListener(CoolListener):
             # Save the types of all ids defined
             _saved.add(_type)
             self.idsTypes[_id.getText()] = _types[i].getText()
+        
+        # Type Rule: Union of all branches
+        _firstName = _types[0].getText()
+        _saved.discard(_firstName)
+        _first  = storage.lookupClass(_firstName)
+        _union = storage.union_mult(_first, _saved)
+        storage.ctxTypes[ctx] = _union
     
     def exitNew(self, ctx: CoolParser.NewContext):
         # Type Rule: Pass type in rule
