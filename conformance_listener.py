@@ -87,7 +87,8 @@ class ConformanceListener(CoolListener):
             # SELF_TYPE sets type to the current klass, no matter if its inherited
             _type = self.idsTypes.klass.name
             # SELF_TYPE requires a dynamic expr type
-            if storage.ctxTypes[_expr] != 'self':
+            _exprType = storage.ctxTypes[_expr]
+            if _exprType != 'self' and _exprType != 'SELF_TYPE':
                 raise myexceptions.TypeCheckMismatch
         else:
             # Check that the result of the method conforms to its type and that the types exist
@@ -165,6 +166,11 @@ class ConformanceListener(CoolListener):
             if not _to.conforms(_assign):
                 raise myexceptions.DoesNotConform
     
+    def exitNew(self, ctx: CoolParser.NewContext):
+        # Type Rule: Pass type in rule
+        _type = ctx.TYPE().getText()
+        storage.ctxTypes[ctx] = _type
+
     def exitBlock(self, ctx: CoolParser.BlockContext):
         # Type Rule: Pass type of last expr
         _expr = ctx.expr()
@@ -255,10 +261,15 @@ class ConformanceListener(CoolListener):
         if not _right.conforms(_left):
             raise myexceptions.MethodNotFound
 
-    def exitNew(self, ctx: CoolParser.NewContext):
-        # Type Rule: Pass type in rule
-        _type = ctx.TYPE().getText()
-        storage.ctxTypes[ctx] = _type
+    def exitNeg(self, ctx: CoolParser.NegContext):
+        # Type Rule: if expr is Int, pass Int
+        _expr = ctx.expr()
+        if storage.ctxTypes[ctx.expr()] == 'Int':
+            storage.ctxTypes[ctx] = 'Int'
+    
+    def exitIsvoid(self, ctx: CoolParser.IsvoidContext):
+        # Type Rule: pass Bool
+        storage.ctxTypes[ctx] = 'Bool'
 
     def exitMult(self, ctx: CoolParser.MultContext):
         # Type rule: both expr should be Int, pass Int
@@ -331,11 +342,6 @@ class ConformanceListener(CoolListener):
         if storage.ctxTypes[ctx.expr()] == 'Bool':
             storage.ctxTypes[ctx] = 'Bool'
 
-    def exitNeg(self, ctx: CoolParser.NegContext):
-        # Type Rule: if expr is Int, pass Int
-        _expr = ctx.expr()
-        if storage.ctxTypes[ctx.expr()] == 'Int':
-            storage.ctxTypes[ctx] = 'Int'
 
     def exitAssign(self, ctx: CoolParser.AssignContext):
         # Check conformance of types
