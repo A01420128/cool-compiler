@@ -9,7 +9,7 @@ ex = {'Base'}
 es = {'Program', 'Klass', 'Method'}
 
 # True names
-tt = {'Program': 'AProgram', 'Klass': 'AClassDecl', 'Method': 'AMethodFeature', 'Block':'AListExpr', 'Add':'APlusExpr', 'Sub':'AMinusExpr','Mult':'AMultExpr', 'Div':'ADivExpr','Integer':'AIntExpr'}
+tt = {'Program': 'AProgram', 'Klass': 'AClassDecl', 'Method': 'AMethodFeature', 'Block':'AListExpr', 'Add':'APlusExpr', 'Sub':'AMinusExpr','Mult':'AMultExpr', 'Div':'ADivExpr','Integer':'AIntExpr', 'Bool':'ABoolExpr', 'Call':'ACallExpr', 'Object':'AObjectExpr', 'Formal':'AFormal'}
 
 class TreePrinter(CoolListener):
     def __init__(self, types={}):
@@ -41,8 +41,6 @@ class TreePrinter(CoolListener):
                 self.output += "{}   |- {}\n".format(s, ctx.typemethod)
             if type(ctx) is CoolParser.IntegerContext:
                 self.output += "{}|   `- {}\n".format(s, ctx.truevalue)
-
-            
 
     def exitEveryRule(self, ctx):
         self.depth = self.depth - 1

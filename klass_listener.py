@@ -110,6 +110,7 @@ class KlassListener(CoolListener):
         # Type rule: Pass TYPE()
         _type = ctx.TYPE().getText()
         storage.ctxTypes[ctx] = _type
+        ctx.typename = _type
     
     def setBaseClasses(self):
         k = storage.Klass('Object')
