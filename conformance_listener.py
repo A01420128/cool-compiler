@@ -14,7 +14,9 @@ class ConformanceListener(CoolListener):
 
     def enterKlass(self, ctx: CoolParser.KlassContext):
         _klassName = ctx.TYPE()[0].getText()
+        ctx.nameklass = _klassName
         _klass = storage.lookupClass(_klassName)
+        ctx.nameinherits = _klass.inherits
 
         # Start an ids symbol table in the current klass
         self.idsTypes = storage.SymbolTableWithScopes(_klass)
@@ -136,6 +138,7 @@ class ConformanceListener(CoolListener):
         # Type Rule: Pass child type
         _type = storage.ctxTypes[ctx.getChild(0)]
         storage.ctxTypes[ctx] = _type
+        ctx.typename = _type
 
     def enterIf(self, ctx: CoolParser.IfContext):
         self.idsTypes.openScope()
@@ -152,6 +155,7 @@ class ConformanceListener(CoolListener):
         _union = _trueKlass.union(_falseKlass)
 
         storage.ctxTypes[ctx] = _union
+        ctx.typename = _union
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
@@ -167,6 +171,7 @@ class ConformanceListener(CoolListener):
         
         # Type Rule: Pass object
         storage.ctxTypes[ctx] = 'Object'
+        ctx.typename = 'Object'
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
     
@@ -199,6 +204,7 @@ class ConformanceListener(CoolListener):
         _last = _expr[len(_expr) - 1]
         _lastType = storage.ctxTypes[_last]
         storage.ctxTypes[ctx] = _lastType
+        ctx.typename = _lastType
         for _i in ctx.ID():
             self.idsTypes.closeScope()
 
@@ -227,6 +233,7 @@ class ConformanceListener(CoolListener):
         _first  = storage.lookupClass(_firstName)
         _union = storage.union_mult(_first, _saved)
         storage.ctxTypes[ctx] = _union
+        ctx.typename = _union
         self.idsTypes.openScope()
     
     def exitCase(self, ctx: CoolParser.CaseContext):
@@ -239,6 +246,7 @@ class ConformanceListener(CoolListener):
         # Type Rule: Pass type in rule
         _type = ctx.TYPE().getText()
         storage.ctxTypes[ctx] = _type
+        ctx.typename = _type
         self.idsTypes.closeScope()
     
     def enterBlock(self, ctx: CoolParser.BlockContext):
@@ -251,6 +259,7 @@ class ConformanceListener(CoolListener):
         _expr = ctx.expr()
         _last = storage.ctxTypes[_expr[len(_expr) - 1]]
         storage.ctxTypes[ctx] = _last
+        ctx.typename = _last
         for _ex in _expr:
             self.idsTypes.closeScope()
     
@@ -334,6 +343,7 @@ class ConformanceListener(CoolListener):
             _calltype = _klass.name
 
         storage.ctxTypes[ctx] = _calltype
+        ctx.typename = _calltype
         for _ex in _expr:
             self.idsTypes.closeScope()
         
@@ -363,6 +373,7 @@ class ConformanceListener(CoolListener):
         _methodType = _right.lookupMethod(_id).type
         # Type Rule: Same as right side. Validate later.
         storage.ctxTypes[ctx] = _methodType
+        ctx.typename = _methodType
         for _ex in _expr:
             self.idsTypes.closeScope()
     
@@ -397,6 +408,7 @@ class ConformanceListener(CoolListener):
             raise myexceptions.TypeCheckMismatch
         else:  
             storage.ctxTypes[ctx] = 'Int'
+            ctx.typename = 'Int'
         
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
@@ -413,6 +425,7 @@ class ConformanceListener(CoolListener):
             raise myexceptions.TypeCheckMismatch
         else:  
             storage.ctxTypes[ctx] = 'Int'
+            ctx.typename = 'Int'
 
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
@@ -429,6 +442,7 @@ class ConformanceListener(CoolListener):
             raise myexceptions.TypeCheckMismatch
         else:  
             storage.ctxTypes[ctx] = 'Int'
+            ctx.typename = 'Int'
         
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
@@ -445,6 +459,7 @@ class ConformanceListener(CoolListener):
             raise myexceptions.TypeCheckMismatch
         else:  
             storage.ctxTypes[ctx] = 'Int'
+            ctx.typename = 'Int'
 
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
@@ -461,6 +476,7 @@ class ConformanceListener(CoolListener):
             raise myexceptions.TypeCheckMismatch
         else:  
             storage.ctxTypes[ctx] = 'Bool'
+            ctx.typename = 'Int'
         
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
@@ -477,6 +493,7 @@ class ConformanceListener(CoolListener):
             raise myexceptions.TypeCheckMismatch
         else:  
             storage.ctxTypes[ctx] = 'Bool'
+            ctx.typename = 'Int'
         
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
@@ -496,6 +513,7 @@ class ConformanceListener(CoolListener):
                 raise myexceptions.TypeCheckMismatch
 
         storage.ctxTypes[ctx] = 'Bool'
+        ctx.typename = 'Int'
 
         self.idsTypes.closeScope()
         self.idsTypes.closeScope()
@@ -507,6 +525,7 @@ class ConformanceListener(CoolListener):
         # Type Rule: expr should be Bool, pass Bool
         if storage.ctxTypes[ctx.expr()] == 'Bool':
             storage.ctxTypes[ctx] = 'Bool'
+            ctx.typename = 'Bool'
         
         self.idsTypes.closeScope()
 
@@ -532,12 +551,14 @@ class ConformanceListener(CoolListener):
 
         # Type Rule: pass type of expr
         storage.ctxTypes[ctx] = _exprType
+        ctx.typename = _exprType
         self.idsTypes.closeScope()
 
     def exitParens(self, ctx: CoolParser.ParensContext):
         # Type Rule: Pass expr context
         _type = storage.ctxTypes[ctx.expr()]
         storage.ctxTypes[ctx] = _type
+        ctx.typename = _type
 
     def exitObject(self, ctx: CoolParser.ObjectContext):
         # Type rule: Pass type of ID
@@ -547,17 +568,22 @@ class ConformanceListener(CoolListener):
         try:
             _type = self.idsTypes[_id]
             storage.ctxTypes[ctx] = _type
+            ctx.typename = _type
         except KeyError:
             raise myexceptions.UndeclaredIdentifier
     
     def exitInteger(self, ctx: CoolParser.IntegerContext):
         # Type Rule: Pass 'Int'
         storage.ctxTypes[ctx] = 'Int'
+        ctx.truevalue = ctx.INTEGER().getText()
+        ctx.typename = 'Int'
     
     def exitString(self, ctx: CoolParser.StringContext):
         # Type Rule: Pass 'String'
         storage.ctxTypes[ctx] = 'String'
+        ctx.typename = 'String'
     
     def exitBool(self, ctx: CoolParser.BoolContext):
         # Type Rule: Pass 'Bool'
         storage.ctxTypes[ctx] = 'Bool'
+        ctx.typename = 'Bool'

@@ -43,7 +43,10 @@ Tuvimos dos listeners:
 
 El unico cambio a la gramatica fue poner '~' para el caso #neg, porque no lo reconocia antlr.
 
-En los tests de la etapa3, no pudimos correr esto, porque treePrinter no tenia getOutput. Lo dejamos comentado.
+### Sobre TreePrinter
+
+Al final intentamos imprimir el arbol de la ultima parte para comparar con el output esperado, pero nos encontramos
+con muchos cambios de formato y por eso optamos por comentar esta parte y dejar que los test corrieran solos.
 
 ```python
 treePrinter = TreePrinter(ctxTypes)
@@ -51,11 +54,90 @@ walker.walk(treePrinter, tree)
 output = treePrinter.getOutput()
 
 expected = output.split('\n')
-with open('expected/semantic/%s.txt' % caseName) as f:
+with open('expected/semantic/%s.cool.out' % caseName) as f:
     for line1, line2 in zip(f, expected):
         if line1[:-1] != line2:
-            print ("Diferencia!!! [%s]-[%s]" % (line1, line2))
+            print ("%s%s" % (line2, line1))
             return False
+return True
 ```
 
-Pero consideramos que lo importante es que se corrierna los casos sin regresar excepciones.
+Estos fueron los primeros resultados para el tree printer.
+
+```zsh
+>- AProgram
+   `- AClassDecl
+      |- Main
+      |- Object
+      `- AMethodFeature
+         |- main
+         |- Object
+         `- AListExpr:Int
+            `- APlusExpr:Int
+                  `- AIntExpr:Int
+                  |   `- 5
+                  `- AIntExpr:Int
+                  |   `- 4
+            `- AMinusExpr:Int
+                  `- AIntExpr:Int
+                  |   `- 5
+                  `- AIntExpr:Int
+                  |   `- 4
+            `- AMultExpr:Int
+                  `- AIntExpr:Int
+                  |   `- 3
+                  `- AIntExpr:Int
+                  |   `- 2
+            `- ADivExpr:Int
+                  `- AIntExpr:Int
+                  |   `- 3
+                  `- AIntExpr:Int
+                  |   `- 2
+
+>- AProgram  >- AProgram
+
+F
+======================================================================
+FAIL: test0 (__main__.CoolTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/tlacuilose/Documents/python/tec/COM/ANTLR/proyecto/etapa3.py", line 82, in <lambda>
+    methods['test%d' % i] = lambda self: self.assertTrue(parseAndCompare(cases[i]))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 1 test in 0.010s
+```
+Comparandolo con:
+
+```zsh
+  >- AProgram
+     `- AClassDecl
+        |- Main
+        |- Object
+        `- AMethodFeature
+           |- main
+           |- Object
+           `- AListExpr:Int
+              |- APlusExpr:Int
+              |  |- AIntExpr:Int
+              |  |  `- 5
+              |  `- AIntExpr:Int
+              |     `- 4
+              |- AMinusExpr:Int
+              |  |- AIntExpr:Int
+              |  |  `- 5
+              |  `- AIntExpr:Int
+              |     `- 4
+              |- AMultExpr:Int
+              |  |- AIntExpr:Int
+              |  |  `- 3
+              |  `- AIntExpr:Int
+              |     `- 2
+              `- ADivExpr:Int
+                 |- AIntExpr:Int
+                 |  `- 3
+                 `- AIntExpr:Int
+                    `- 2
+
+```
