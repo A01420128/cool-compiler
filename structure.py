@@ -6,6 +6,8 @@ ctxTypes = None
 stringConst = []
 intConst = []
 boolConst = []
+str_const_tags = []
+all_classes_names = []
 
 class HierarchyException(Exception):
     pass

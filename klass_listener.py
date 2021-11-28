@@ -125,13 +125,17 @@ class KlassListener(CoolListener):
         k.addMethod('in_int', storage.Method('Int'))
         self.baseKlasses['IO'] = k
         k = storage.Klass('Int')
+        k.addAttribute('val', 'Int')
         self.baseKlasses['Int'] = k
         k = storage.Klass('String')
         k.addMethod('length', storage.Method('Int'))
         k.addMethod('concat', storage.Method('String', [('s', 'String')]))
         k.addMethod('substr', storage.Method('String', [('i', 'Int'), ('l', 'Int')]))
+        k.addAttribute('size', 'Int')
+        k.addAttribute('val', 'STRING_CHECKMAYBE')
         self.baseKlasses['String'] = k
         k = storage.Klass('Bool')
+        k.addAttribute('val', 'Int')
         self.baseKlasses['Bool'] = k
         k = storage.Klass('SELF_TYPE')
         self.baseKlasses['SELF_TYPE'] = k

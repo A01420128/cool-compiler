@@ -74,9 +74,32 @@ def constants(o):
     # o.accum += asm.cTplStr.substitute(idx=3, tag=2, size=23, sizeIdx=2, value='hola mundo')
     # o.accum += asm.cTplInt.substitute(idx=5, tag=12, value=340)
 
+    # Tracking the necessary int constants for representing the size of the following strings
     used_int_size = dict()
-    used_int_idx = 0
-    for i, s in enumerate(reversed(storage.stringConst)):
+    used_int_size[0] = 0
+    used_int_idx = 1
+
+    # Adding all clases names as strings
+    # getting top index
+    storage.all_classes_names = list(filter(lambda name: name != 'SELF_TYPE', storage.allClasses.keys())) # Remove SELF_TYPE, remnant of bad semantic?
+    top_idx = (len(storage.stringConst) - 1) + len(storage.all_classes_names)
+    for class_name in storage.all_classes_names:
+        str_obj_size = 4 + math.ceil((len(class_name) + 1) / 4)
+        str_size = len(class_name)
+
+        # Setting the int that is saved for the string size
+        this_int_idx = used_int_size[str_size] if str_size in used_int_size else used_int_idx
+        if str_size not in used_int_size:
+            used_int_size[str_size] = used_int_idx
+            used_int_idx += 1
+
+        o.accum += asm.cTplStr.substitute(idx=top_idx, tag=STR_TAG, size=str_obj_size, sizeIdx=this_int_idx, value=class_name)
+        storage.str_const_tags.append(f'str_const{top_idx}')
+        top_idx -= 1
+
+
+    # Adding all strings
+    for i, s in reversed(list(enumerate(storage.stringConst))):
         str_obj_size = 4 + math.ceil((len(s) + 1) / 4)
         str_size = len(s)
 
@@ -88,11 +111,13 @@ def constants(o):
 
         o.accum += asm.cTplStr.substitute(idx=i, tag=STR_TAG, size=str_obj_size, sizeIdx=this_int_idx, value=s)
     
+    # Adding all ints from storage
     for _int in storage.intConst:
         if _int not in used_int_size:
-            used_int_idx += 1
             used_int_size[_int] = used_int_idx
+            used_int_idx += 1
 
+    # Adding ints from storage and the ones used by strings
     for k, v in used_int_size.items():
         o.accum += asm.cTplInt.substitute(idx=v, tag=INT_TAG, value=k)
 
@@ -112,17 +137,33 @@ def tables(o):
 """
     #Ejemplo (REEMPLAZAR):
 
+    # Agarrar todas las clases, guardar strings de nombres.
+    # guardar en array donde quedaron esos nombres
+    # for c in dict: .word all
+
     o.p('class_nameTab')
-    o.p('.word', 'str_const3')
+    for str_const in storage.str_const_tags:
+        o.p('.word', str_const)
 
     o.p('class_objTab')
-    o.p('.word', 'Object_protObj')
-    o.p('.word', 'Object_init') 
+    for class_name in storage.all_classes_names:
+        o.p('.word', f'{class_name}_protObj')
+        o.p('.word', f'{class_name}_init') 
 
-    o.p('Object_dispTab')
-    o.p('.word', 'Object.abort')
-    o.p('.word', 'Object.type_name')
-    o.p('.word', 'Object.copy')
+    for class_name in storage.all_classes_names:
+        _class = storage.lookupClass(class_name)
+        o.p(f'{class_name}_dispTab')
+        # Get all inherited classes and methods
+        inheritance_seq = [_class]
+        inherit_from = _class
+        while inherit_from.name != 'Object':
+            inherit_from = storage.lookupClass(inherit_from.inherits)
+            inheritance_seq.append(inherit_from)
+
+        # Add all methods from the inheritance sequence
+        for inherited in reversed(inheritance_seq):
+            for method in inherited.methods:
+                o.p('.word', f'{inherited.name}.{method}')
     
 def templates(o):
     """
@@ -137,24 +178,24 @@ def templates(o):
         - dispTab
         - atributos
 """
-    # Ejemplo: nombre=Object, tag->0, tamanio=3, atributos=no tiene
-    o.accum += """
-    .word   -1 
-Object_protObj:
-    .word   0 
-    .word   3 
-    .word   Object_dispTab 
-"""
-    # Ejemplo: nombre=String, tag->4, tamanio=5, atributos=int ptr, 0
-    o.accum += """
-    .word   -1 
-String_protObj:
-    .word   4 
-    .word   5 
-    .word   String_dispTab 
-    .word   int_const0 
-    .word   0 
-"""
+    class_prot_order = ['Object', 'IO', 'Main', 'Bool', 'Int', 'String']
+    t = '    ' # Custom tab
+    for _class_name in storage.all_classes_names:
+        if _class_name not in class_prot_order:
+            class_prot_order.append(_class_name)
+        
+    for i, _class_name in enumerate(class_prot_order):
+        _class = storage.lookupClass(_class_name)
+        prot_size = 3 + len(_class.attributes.keys())
+        to_accum = f'{t}.word{t}-1\n{_class.name}_protObj:\n{t}.word{t}{i}\n{t}.word{t}{prot_size}\n{t}.word{t}{_class_name}_dispTab\n'
+        if (_class_name == 'String'):
+            to_accum += f'{t}.word{t}int_const0\n{t}.word{t}0\n'
+        else:
+            for _atr in _class.attributes.keys():
+                to_accum += f'{t}.word{t}0\n' # Inserting void in not know attributes
+    
+        o.accum += to_accum
+
 
 def heap(o):
     o.accum += asm.heapStr
