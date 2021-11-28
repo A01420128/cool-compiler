@@ -575,15 +575,18 @@ class ConformanceListener(CoolListener):
     def exitInteger(self, ctx: CoolParser.IntegerContext):
         # Type Rule: Pass 'Int'
         storage.ctxTypes[ctx] = 'Int'
+        storage.intConst.append(int(ctx.INTEGER().getText()))
         ctx.truevalue = ctx.INTEGER().getText()
         ctx.typename = 'Int'
     
     def exitString(self, ctx: CoolParser.StringContext):
         # Type Rule: Pass 'String'
         storage.ctxTypes[ctx] = 'String'
+        storage.stringConst.append(ctx.STRING().getText()[1:-1]) # Removing quotes
         ctx.typename = 'String'
     
     def exitBool(self, ctx: CoolParser.BoolContext):
         # Type Rule: Pass 'Bool'
         storage.ctxTypes[ctx] = 'Bool'
+        storage.boolConst.append("UNDEF_BOOL_FIXIT")
         ctx.typename = 'Bool'

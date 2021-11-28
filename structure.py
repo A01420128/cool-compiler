@@ -3,6 +3,9 @@ import unittest
 
 allClasses = {}
 ctxTypes = None
+stringConst = []
+intConst = []
+boolConst = []
 
 class HierarchyException(Exception):
     pass
