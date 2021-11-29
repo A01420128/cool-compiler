@@ -71,6 +71,8 @@ def constants(o):
             - valor
     """
 
+    # TODO: Refactor this, resolve multiple dictionaries
+
     ### POR EJEMPLO (CAMBIAR)
     # o.accum += asm.cTplStr.substitute(idx=3, tag=2, size=23, sizeIdx=2, value='hola mundo')
     # o.accum += asm.cTplInt.substitute(idx=5, tag=12, value=340)
@@ -131,6 +133,7 @@ def constants(o):
 
     # Adding ints from storage and the ones used by strings
     for k, v in used_int_size.items():
+        storage.int_const_dict[k] = f'int_const{v}' # Save all int constants
         o.accum += asm.cTplInt.substitute(idx=v, tag=INT_TAG, value=k)
 
     # Siempre incluir los bool
@@ -243,7 +246,7 @@ def class_inits(o):
     jr	$ra 
 """
 
-def genCode(walker, tree):
+def genCode(walker, tree, file_name):
     o = Output()
     global_data(o)
     constants(o)
@@ -257,13 +260,15 @@ def genCode(walker, tree):
     walker.walk(CodegenListener(o), tree)
 
     # Aquí enviar a un archivo, etc.
-    print(o.out())
+    with open(f'generated/{file_name}.s', 'w') as f:
+        f.write(o.out())
     
 if __name__ == '__main__':
     # Ejecutar como: "python codegen.py <filename>" donde filename es el nombre de alguna de las pruebas
-    parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/mine-hello.cool"))))
-    # parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % sys.argv[1]))))
-    # parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % ("abort")))))
+    file_name = sys.argv[1]
+    # file_name = 'mine-sum'
+    parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % file_name))))
+
     walker = ParseTreeWalker()
     tree = parser.program()
 
@@ -276,4 +281,4 @@ if __name__ == '__main__':
     #walker.walk(Listener2(), tree)
 
     # Pasar parámetros al generador de código 
-    genCode(walker, tree)
+    genCode(walker, tree, file_name)

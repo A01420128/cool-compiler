@@ -1,3 +1,4 @@
+from typing import Literal
 from antlr.CoolListener import CoolListener
 from antlr.CoolParser import CoolParser
 from myexceptions import MethodNotFound
@@ -126,32 +127,28 @@ class CodegenListener(CoolListener):
         pass
 
     def exitMult(self, ctx: CoolParser.MultContext):
-        # TODO: Mult implementation
-        # Type rule: both expr should be Int, pass Int
-        #_left = ctx.getChild(0)
-        #_right = ctx.getChild(2)
-        pass
+        _left = ctx.getChild(0).codegen
+        _right = ctx.getChild(2).codegen
+        k = dict(left_subexp=_left, right_subexp=_right, op='mul')
+        ctx.codegen = asm.arithTpl.substitute(k)
 
     def exitDiv(self, ctx: CoolParser.DivContext):
-        # TODO: Div implementation
-        # Type rule: both expr should be Int, pass Int
-        # _left = ctx.getChild(0)
-        # _right = ctx.getChild(2)
-        pass
+        _left = ctx.getChild(0).codegen
+        _right = ctx.getChild(2).codegen
+        k = dict(left_subexp=_left, right_subexp=_right, op='div')
+        ctx.codegen = asm.arithTpl.substitute(k)
 
     def exitAdd(self, ctx: CoolParser.AddContext):
-        # TODO: Add implementation
-        # Type rule: both expr should be Int, pass Int
-        # _left = ctx.getChild(0)
-        # _right = ctx.getChild(2)
-        pass
+        _left = ctx.getChild(0).codegen
+        _right = ctx.getChild(2).codegen
+        k = dict(left_subexp=_left, right_subexp=_right, op='add')
+        ctx.codegen = asm.arithTpl.substitute(k)
 
     def exitSub(self, ctx: CoolParser.SubContext):
-        # TODO: Sub implementation
-        # Type rule: both expr should be Int, pass Int
-        # _left = ctx.getChild(0)
-        # _right = ctx.getChild(2)
-        pass
+        _left = ctx.getChild(0).codegen
+        _right = ctx.getChild(2).codegen
+        k = dict(left_subexp=_left, right_subexp=_right, op='sub')
+        ctx.codegen = asm.arithTpl.substitute(k)
 
     def exitLt(self, ctx: CoolParser.LtContext):
         # TODO: Lt implementation
@@ -203,10 +200,9 @@ class CodegenListener(CoolListener):
         pass
     
     def exitInteger(self, ctx: CoolParser.IntegerContext):
-        # TODO: Integer implementation
-        # Type Rule: Pass 'Int'
-        # storage.ctxTypes[ctx] = 'Int'
-        pass
+        literal = storage.int_const_dict[ctx.literalval]
+        k = dict(literal=literal, value=literal)
+        ctx.codegen = asm.litTpl.substitute(k)
 
     def exitString(self, ctx: CoolParser.StringContext):
         literal = storage.str_const_dict[ctx.literalval]

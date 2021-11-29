@@ -371,7 +371,7 @@ Main.main:
 	addiu	$sp $sp 4 		# ar
 	lw	$t2 12($s1) 		# ar
 	lw	$t1 12($a0) 		# ar
-	mul	$t1 $t2 $t1 		# ar
+	sub	$t1 $t2 $t1 		# ar
 	sw	$t1 12($a0) 		# ar
 	sw	$a0 0($sp) 		# call: Push parameter
 	addiu	$sp $sp -4 

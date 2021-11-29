@@ -11,6 +11,7 @@ boolConst = []
 str_const_tags = []
 all_classes_names = []
 str_const_dict = dict()
+int_const_dict = dict()
 disp_methods_off = dict()
 
 class HierarchyException(Exception):

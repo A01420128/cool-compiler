@@ -579,6 +579,7 @@ class ConformanceListener(CoolListener):
         storage.ctxTypes[ctx] = 'Int'
         storage.intConst.append(int(ctx.INTEGER().getText()))
         ctx.truevalue = ctx.INTEGER().getText()
+        ctx.literalval = int(ctx.INTEGER().getText())
         ctx.typename = 'Int'
     
     def exitString(self, ctx: CoolParser.StringContext):
