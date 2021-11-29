@@ -103,6 +103,7 @@ class KlassListener(CoolListener):
         for _formal in _formals:
             _params.append((_formal.ID().getText(), storage.ctxTypes[_formal]))
         self.currentKlass.addMethod(name, storage.Method(_type, _params))
+        ctx.nameklass = self.currentKlass.name
         ctx.namemethod = name
         ctx.typemethod = _type
     

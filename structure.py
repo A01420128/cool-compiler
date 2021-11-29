@@ -1,6 +1,8 @@
 from collections import MutableMapping, OrderedDict
 import unittest
 
+FILENAME_STR = '--filename--'
+
 allClasses = {}
 ctxTypes = None
 stringConst = []
@@ -8,6 +10,8 @@ intConst = []
 boolConst = []
 str_const_tags = []
 all_classes_names = []
+str_const_dict = dict()
+disp_methods_off = dict()
 
 class HierarchyException(Exception):
     pass

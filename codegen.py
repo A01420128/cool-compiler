@@ -11,11 +11,12 @@ import asm
 
 from klass_listener import KlassListener
 from conformance_listener import ConformanceListener
+from codegen_listener import CodegenListener
 import structure as storage
 
+INT_TAG = 2
 BOO_TAG = 3
-INT_TAG = 4
-STR_TAG = 5
+STR_TAG = 4
 
 class Output:
     def __init__(self):
@@ -79,9 +80,19 @@ def constants(o):
     used_int_size[0] = 0
     used_int_idx = 1
 
+    # Adding filename to strings
+    if '--filename--' not in storage.stringConst:
+        storage.stringConst.append(storage.FILENAME_STR)
+
     # Adding all clases names as strings
+    # Setting the tag order of classes
+    storage.all_classes_names = ['Object', 'IO', 'Int', 'Bool', 'String', 'Main']
+    t = '    ' # Custom tab
+    for _class_name in storage.allClasses.keys():
+        if _class_name not in storage.all_classes_names and _class_name != 'SELF_TYPE':
+            storage.all_classes_names.append(_class_name)
+
     # getting top index
-    storage.all_classes_names = list(filter(lambda name: name != 'SELF_TYPE', storage.allClasses.keys())) # Remove SELF_TYPE, remnant of bad semantic?
     top_idx = (len(storage.stringConst) - 1) + len(storage.all_classes_names)
     for class_name in storage.all_classes_names:
         str_obj_size = 4 + math.ceil((len(class_name) + 1) / 4)
@@ -109,6 +120,7 @@ def constants(o):
             used_int_size[str_size] = used_int_idx
             used_int_idx += 1
 
+        storage.str_const_dict[s] = f'str_const{i}'
         o.accum += asm.cTplStr.substitute(idx=i, tag=STR_TAG, size=str_obj_size, sizeIdx=this_int_idx, value=s)
     
     # Adding all ints from storage
@@ -161,9 +173,12 @@ def tables(o):
             inheritance_seq.append(inherit_from)
 
         # Add all methods from the inheritance sequence
+        idx_off = 0
         for inherited in reversed(inheritance_seq):
             for method in inherited.methods:
                 o.p('.word', f'{inherited.name}.{method}')
+                storage.disp_methods_off[f'{class_name}.{method}'] = idx_off
+                idx_off += 1
     
 def templates(o):
     """
@@ -178,23 +193,26 @@ def templates(o):
         - dispTab
         - atributos
 """
-    class_prot_order = ['Object', 'IO', 'Main', 'Bool', 'Int', 'String']
     t = '    ' # Custom tab
-    for _class_name in storage.all_classes_names:
-        if _class_name not in class_prot_order:
-            class_prot_order.append(_class_name)
-        
-    for i, _class_name in enumerate(class_prot_order):
+    for i, _class_name in enumerate(storage.all_classes_names):
         _class = storage.lookupClass(_class_name)
         prot_size = 3 + len(_class.attributes.keys())
-        to_accum = f'{t}.word{t}-1\n{_class.name}_protObj:\n{t}.word{t}{i}\n{t}.word{t}{prot_size}\n{t}.word{t}{_class_name}_dispTab\n'
+        o.p('.word', '-1')
+        o.p(f'{_class_name}_protObj')
+        o.p('.word', i)
+        o.p('.word', prot_size)
+        o.p('.word', f'{_class_name}_dispTab')
+        # to_accum = f'{t}.word{t}-1\n{_class.name}_protObj:\n{t}.word{t}{i}\n{t}.word{t}{prot_size}\n{t}.word{t}{_class_name}_dispTab\n'
         if (_class_name == 'String'):
-            to_accum += f'{t}.word{t}int_const0\n{t}.word{t}0\n'
+            o.p('.word', 'int_const0')
+            o.p('.word', '0')
+            # to_accum += f'{t}.word{t}int_const0\n{t}.word{t}0\n'
         else:
             for _atr in _class.attributes.keys():
-                to_accum += f'{t}.word{t}0\n' # Inserting void in not know attributes
+                # to_accum += f'{t}.word{t}0\n' # Inserting void in not know attributes
+                o.p('.word', '0')
     
-        o.accum += to_accum
+        # o.accum += to_accum
 
 
 def heap(o):
@@ -204,10 +222,28 @@ def global_text(o):
     o.accum += asm.textStr
 
 def class_inits(o):
-    pass
+    for _class_name in storage.all_classes_names:
+        # TODO: Missing initializers for parametres, now only doing the regular call method protocol.
+        o.p(f'{_class_name}_init')
+        o.accum += """    addiu	$sp $sp -12 
+    sw	$fp 12($sp) 
+    sw	$s0 8($sp) 
+    sw	$ra 4($sp) 
+    addiu	$fp $sp 4 
+    move	$s0 $a0 
+"""
+        _class = storage.lookupClass(_class_name)
+        if _class.inherits != _class_name:
+            o.accum += f'    jal {_class.inherits}_init\n' # Add initializer
+        o.accum += """    move	$a0 $s0 
+    lw	$fp 12($sp) 
+    lw	$s0 8($sp) 
+    lw	$ra 4($sp) 
+    addiu	$sp $sp 12 
+    jr	$ra 
+"""
 
-
-def genCode():
+def genCode(walker, tree):
     o = Output()
     global_data(o)
     constants(o)
@@ -215,14 +251,18 @@ def genCode():
     templates(o)
     heap(o)
     global_text(o)
+    class_inits(o)
+
+    # Functions gen
+    walker.walk(CodegenListener(o), tree)
 
     # Aquí enviar a un archivo, etc.
     print(o.out())
     
 if __name__ == '__main__':
     # Ejecutar como: "python codegen.py <filename>" donde filename es el nombre de alguna de las pruebas
-    parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/fact.cool"))))
-    #parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % sys.argv[1]))))
+    parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/mine-hello.cool"))))
+    # parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % sys.argv[1]))))
     # parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % ("abort")))))
     walker = ParseTreeWalker()
     tree = parser.program()
@@ -236,4 +276,4 @@ if __name__ == '__main__':
     #walker.walk(Listener2(), tree)
 
     # Pasar parámetros al generador de código 
-    genCode()
+    genCode(walker, tree)

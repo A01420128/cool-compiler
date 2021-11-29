@@ -282,28 +282,27 @@ $right_subexp
 $label:
 """)
 
-#definir: exp
+#definir: exp FIXME: Is exp needed???
 callParametersTpl = Template("""
-$exp
     sw      $$a0    0($$sp)                 #call: push Param
     addiu   $$sp    $$sp        -4          #call:
 """)
 
 # Para el call hay 3 tipos y $$a0 cambia (instancia sobre la que se llama el método) 
 # 1. metodo( params ... )
-callStr1 = """
+callStr1 = Template("""
     move    $$a0    $$s0                    #call: get self into $$a0
-"""
+""")
 
 # 2. (object expr).metodo( params ... )
 # 3. (object expr)@Klass.metodo( params ... )
 #definir: exp
-callStr1 = Template("""
+callStr2 = Template("""
     $exp
 """)
 
 
-#definir: fileName, line
+#definir: fileName, line, label
 callTpl1 = Template("""
     bne     $$a0    $$zero      $label      #call: protect from dispatch to void
     la      $$a0    $fileName               #call: constant object with name of the file

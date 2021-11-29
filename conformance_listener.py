@@ -344,6 +344,8 @@ class ConformanceListener(CoolListener):
 
         storage.ctxTypes[ctx] = _calltype
         ctx.typename = _calltype
+        ctx.nameklass = _klassName
+        ctx.namemethod = _id
         for _ex in _expr:
             self.idsTypes.closeScope()
         
@@ -582,7 +584,8 @@ class ConformanceListener(CoolListener):
     def exitString(self, ctx: CoolParser.StringContext):
         # Type Rule: Pass 'String'
         storage.ctxTypes[ctx] = 'String'
-        storage.stringConst.append(ctx.STRING().getText()[1:-1]) # Removing quotes
+        ctx.literalval = ctx.STRING().getText()[1:-1] # Removing quotes
+        storage.stringConst.append(ctx.literalval)
         ctx.typename = 'String'
     
     def exitBool(self, ctx: CoolParser.BoolContext):
