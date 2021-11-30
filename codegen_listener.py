@@ -153,10 +153,7 @@ class CodegenListener(CoolListener):
         pass
     
     def exitNeg(self, ctx: CoolParser.NegContext):
-        # TODO: Neg implementation
-        # Type Rule: if expr is Int, pass Int
-        # _expr = ctx.expr()
-        pass
+        ctx.codegen = asm.negStr.substitute()
     
     def exitIsvoid(self, ctx: CoolParser.IsvoidContext):
         _expr = ctx.expr().codegen
@@ -210,9 +207,9 @@ class CodegenListener(CoolListener):
         ctx.codegen = asm.eqTpl.substitute(k)
 
     def exitNot(self, ctx: CoolParser.NotContext):
-        # TODO: Not implementation
-        # Type Rule: expr should be Bool, pass Bool
-        pass
+        k = dict(label=f'label{self.num_labels}')
+        self.num_labels += 1
+        ctx.codegen = asm.notTpl.substitute(k)
 
     def exitAssign(self, ctx: CoolParser.AssignContext):
         _id = ctx.ID().getText()
@@ -227,9 +224,12 @@ class CodegenListener(CoolListener):
 
     def exitObject(self, ctx: CoolParser.ObjectContext):
         # Pop from idx_stack on load
-        address = self.locals_idx[ctx.namesymbol]
-        k = dict(address=address, symbol=ctx.namesymbol, klass=ctx.typename)
-        ctx.codegen = asm.varTpl.substitute(k)
+        if ctx.namesymbol == 'self':
+            ctx.codegen = asm.selfStr.substitute()
+        else:
+            address = self.locals_idx[ctx.namesymbol]
+            k = dict(address=address, symbol=ctx.namesymbol, klass=ctx.typename)
+            ctx.codegen = asm.varTpl.substitute(k)
     
     def exitInteger(self, ctx: CoolParser.IntegerContext):
         literal = storage.int_const_dict[ctx.literalval]
@@ -241,7 +241,6 @@ class CodegenListener(CoolListener):
         k = dict(literal=literal, value=ctx.literalval)
         ctx.codegen = asm.litTpl.substitute(k)
     
-    def exitBool(self, ctx: CoolParser.BoolContext):
-        # TODO: Bool implementation
+    # def exitBool(self, ctx: CoolParser.BoolContext):
         # Bools are saved as constanst and accesed that way, only two addresses
-        pass
+        # pass

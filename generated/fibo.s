@@ -150,6 +150,20 @@ int_const5:
     .word   12
 
     .word   -1
+int_const6:
+    .word   2
+    .word   4
+    .word   Int_dispTab
+    .word   1
+
+    .word   -1
+int_const7:
+    .word   2
+    .word   4
+    .word   Int_dispTab
+    .word   15
+
+    .word   -1
 bool_const0:
     .word   3
     .word   4
@@ -216,6 +230,7 @@ Main_dispTab:
     .word    IO.out_int
     .word    IO.in_string
     .word    IO.in_int
+    .word    Main.fibo
     .word    Main.main
     .word    -1
 Object_protObj:
@@ -346,7 +361,7 @@ Main_init:
     addiu	$sp $sp 12 
     jr	$ra 
 
-Main.main:
+Main.fibo:
     addiu   $sp    $sp    -12        #inm: frame has 0 locals
     sw      $fp    12($sp)         #inm: save $fp
     sw      $s0    8($sp)         #inm: save $s0 (self)
@@ -355,12 +370,130 @@ Main.main:
     move    $s0    $a0                #inm: self to $s0
 
 
-    la      $a0     int_const2           #literal, 2
+
+    lw      $a0     12($fp)            #obj: load [i], Int
+
+    sw      $a0    0($sp)                 #=: push left subexp into the stack
+    addiu   $sp    $sp    -4              #=:
+
+    la      $a0     int_const0           #literal, 0
+
+    lw      $s1    4($sp)                 #=: pop saved value from the stack into $s1
+    addiu   $sp    $sp     4              #=:
+
+    move    $t1    $s1                    #=: load objects (addresses) to compare
+    move    $t2    $a0                    #=:
+        
+    la      $a0    bool_const1             #=: load true
+    beq     $t1    $t2    label0          #=: if identical (same address)
+        
+    la      $a1    bool_const0             #=: load false
+    jal     equality_test                   #=: the runtime will know...
+label0:
+
+    lw      $t1    12($a0)            #if: get value from boolean
+    beqz    $t1    label6        #if: jump if false
+
+    la      $a0     int_const0           #literal, 0
+
+    b       label7                 #if: jump to endif
+label6:
+
+
+
+    lw      $a0     12($fp)            #obj: load [i], Int
+
+    sw      $a0    0($sp)                 #=: push left subexp into the stack
+    addiu   $sp    $sp    -4              #=:
+
+    la      $a0     int_const6           #literal, 1
+
+    lw      $s1    4($sp)                 #=: pop saved value from the stack into $s1
+    addiu   $sp    $sp     4              #=:
+
+    move    $t1    $s1                    #=: load objects (addresses) to compare
+    move    $t2    $a0                    #=:
+        
+    la      $a0    bool_const1             #=: load true
+    beq     $t1    $t2    label1          #=: if identical (same address)
+        
+    la      $a1    bool_const0             #=: load false
+    jal     equality_test                   #=: the runtime will know...
+label1:
+
+    lw      $t1    12($a0)            #if: get value from boolean
+    beqz    $t1    label4        #if: jump if false
+
+    la      $a0     int_const6           #literal, 1
+
+    b       label5                 #if: jump to endif
+label4:
+
+
+
+    lw      $a0     12($fp)            #obj: load [i], Int
 
     sw      $a0     0($sp)            #arith: push left subexp into the stack
     addiu   $sp     $sp       -4      #arith
 
-    la      $a0     int_const3           #literal, 3
+    la      $a0     int_const6           #literal, 1
+
+    jal     Object.copy                 #arith: get a copy to store value on
+    lw      $s1    4($sp)             #arith: pop saved value from the stack to $s1
+    addiu   $sp    $sp        4       #arith
+    lw      $t2    12($s1)            #arith: load in temp register
+    lw      $t1    12($a0)            #arith: load in temp register
+    sub     $t1    $t2        $t1    #arith: operate on them
+    sw      $t1    12($a0)            #arith: store result in copy
+
+    sw      $a0    0($sp)                 #call: push Param
+    addiu   $sp    $sp        -4          #call:
+
+    move    $a0    $s0                    #call: get self into $a0
+
+    bne     $a0    $zero      label2      #call: protect from dispatch to void
+    la      $a0    str_const0               #call: constant object with name of the file
+    li      $t1    8                   #call: line number
+    jal    _dispatch_abort                  #call: message and die
+label2:
+
+    lw      $t1    8($a0)                 #call: ptr to dispatch table
+    lw      $t1    28($t1)              #call: method fibo is at offset 28
+    jalr    $t1
+
+    sw      $a0     0($sp)            #arith: push left subexp into the stack
+    addiu   $sp     $sp       -4      #arith
+
+
+    lw      $a0     12($fp)            #obj: load [i], Int
+
+    sw      $a0     0($sp)            #arith: push left subexp into the stack
+    addiu   $sp     $sp       -4      #arith
+
+    la      $a0     int_const2           #literal, 2
+
+    jal     Object.copy                 #arith: get a copy to store value on
+    lw      $s1    4($sp)             #arith: pop saved value from the stack to $s1
+    addiu   $sp    $sp        4       #arith
+    lw      $t2    12($s1)            #arith: load in temp register
+    lw      $t1    12($a0)            #arith: load in temp register
+    sub     $t1    $t2        $t1    #arith: operate on them
+    sw      $t1    12($a0)            #arith: store result in copy
+
+    sw      $a0    0($sp)                 #call: push Param
+    addiu   $sp    $sp        -4          #call:
+
+    move    $a0    $s0                    #call: get self into $a0
+
+    bne     $a0    $zero      label3      #call: protect from dispatch to void
+    la      $a0    str_const0               #call: constant object with name of the file
+    li      $t1    8                   #call: line number
+    jal    _dispatch_abort                  #call: message and die
+label3:
+
+    lw      $t1    8($a0)                 #call: ptr to dispatch table
+    lw      $t1    28($t1)              #call: method fibo is at offset 28
+    jalr    $t1
 
     jal     Object.copy                 #arith: get a copy to store value on
     lw      $s1    4($sp)             #arith: pop saved value from the stack to $s1
@@ -370,16 +503,52 @@ Main.main:
     add     $t1    $t2        $t1    #arith: operate on them
     sw      $t1    12($a0)            #arith: store result in copy
 
+label5:
+
+label7:
+
+    lw      $fp    12($sp)         #outm: restore 12
+    lw      $s0    8($sp)         #outm: restore 8 (self)
+    lw      $ra    4($sp)         #outm: restore 4
+#outm: Clean everything! restore sp, 4 from formals, 0 from local frame
+    addiu   $sp    $sp    16
+    jr      $ra                        #outm: jump and make happy the callee
+
+Main.main:
+    addiu   $sp    $sp    -12        #inm: frame has 0 locals
+    sw      $fp    12($sp)         #inm: save $fp
+    sw      $s0    8($sp)         #inm: save $s0 (self)
+    sw      $ra    4($sp)         #inm: save $ra
+    addiu   $fp    $sp    4           #inm: $fp points to locals
+    move    $s0    $a0                #inm: self to $s0
+
+    la      $a0     int_const7           #literal, 15
+
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:
 
     move    $a0    $s0                    #call: get self into $a0
 
-    bne     $a0    $zero      label0      #call: protect from dispatch to void
+    bne     $a0    $zero      label8      #call: protect from dispatch to void
     la      $a0    str_const0               #call: constant object with name of the file
-    li      $t1    3                   #call: line number
+    li      $t1    13                   #call: line number
     jal    _dispatch_abort                  #call: message and die
-label0:
+label8:
+
+    lw      $t1    8($a0)                 #call: ptr to dispatch table
+    lw      $t1    28($t1)              #call: method fibo is at offset 28
+    jalr    $t1
+
+    sw      $a0    0($sp)                 #call: push Param
+    addiu   $sp    $sp        -4          #call:
+
+    move    $a0    $s0                    #call: get self into $a0
+
+    bne     $a0    $zero      label9      #call: protect from dispatch to void
+    la      $a0    str_const0               #call: constant object with name of the file
+    li      $t1    13                   #call: line number
+    jal    _dispatch_abort                  #call: message and die
+label9:
 
     lw      $t1    8($a0)                 #call: ptr to dispatch table
     lw      $t1    16($t1)              #call: method out_int is at offset 16

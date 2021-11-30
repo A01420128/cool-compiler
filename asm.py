@@ -144,9 +144,9 @@ litTpl = Template("""
     la      $$a0     $literal           #literal, $value
 """)
 
-selfStr = """
-    move    $a0     $s0                 #self
-"""
+selfStr = Template("""
+    move    $$a0     $$s0                 #self
+""")
 
 # En los letdecl, la expr es opcional...
 
@@ -184,12 +184,12 @@ varTpl = Template("""
     lw      $$a0     $address            #obj: load [$symbol], $klass
 """)
 
-negStr = """
+negStr = Template("""
     jal     Object.copy                 #neg
-    lw      $t1     12($a0)             #neg
-    neg     $t1     $t1                 #neg
-    sw      $t1     12($a0)             #neg
-"""
+    lw      $$t1     12($$a0)             #neg
+    neg     $$t1     $$t1                 #neg
+    sw      $$t1     12($$a0)             #neg
+""")
 
 # definir: label
 notTpl = Template("""

@@ -199,7 +199,10 @@ class ConformanceListener(CoolListener):
         for i, _type in enumerate(_types):
             # Only for all expr except the last one.
             if i < (len(_expr) - 1):
-                _assign = storage.lookupClass(storage.ctxTypes[_expr[i]])
+                _klass_from_type = storage.ctxTypes[_expr[i]]
+                if _klass_from_type == 'self':
+                    _klass_from_type = self.idsTypes.klass.name
+                _assign = storage.lookupClass(_klass_from_type)
                 _expr[i].namesymbol = _ids[i].getText()
                 _to = storage.lookupClass(_type.getText())
                 if not _to.conforms(_assign):

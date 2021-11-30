@@ -278,8 +278,8 @@ def genCode(walker, tree, file_name):
     
 if __name__ == '__main__':
     # Ejecutar como: "python codegen.py <filename>" donde filename es el nombre de alguna de las pruebas
-    # file_name = sys.argv[1]
-    file_name = 'basic-init'
+    file_name = sys.argv[1]
+    # file_name = 'basic-init'
     parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % file_name))))
 
     walker = ParseTreeWalker()

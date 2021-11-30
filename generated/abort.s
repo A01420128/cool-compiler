@@ -212,10 +212,6 @@ Main_dispTab:
     .word    Object.abort
     .word    Object.type_name
     .word    Object.copy
-    .word    IO.out_string
-    .word    IO.out_int
-    .word    IO.in_string
-    .word    IO.in_int
     .word    Main.main
     .word    -1
 Object_protObj:
@@ -338,7 +334,7 @@ Main_init:
     sw	$ra 4($sp) 
     addiu	$fp $sp 4 
     move	$s0 $a0 
-    jal IO_init
+    jal Object_init
     move	$a0 $s0 
     lw	$fp 12($sp) 
     lw	$s0 8($sp) 
@@ -354,36 +350,19 @@ Main.main:
     addiu   $fp    $sp    4           #inm: $fp points to locals
     move    $s0    $a0                #inm: self to $s0
 
-
-    la      $a0     int_const2           #literal, 2
-
-    sw      $a0     0($sp)            #arith: push left subexp into the stack
-    addiu   $sp     $sp       -4      #arith
-
-    la      $a0     int_const3           #literal, 3
-
-    jal     Object.copy                 #arith: get a copy to store value on
-    lw      $s1    4($sp)             #arith: pop saved value from the stack to $s1
-    addiu   $sp    $sp        4       #arith
-    lw      $t2    12($s1)            #arith: load in temp register
-    lw      $t1    12($a0)            #arith: load in temp register
-    add     $t1    $t2        $t1    #arith: operate on them
-    sw      $t1    12($a0)            #arith: store result in copy
-
-    sw      $a0    0($sp)                 #call: push Param
-    addiu   $sp    $sp        -4          #call:
-
     move    $a0    $s0                    #call: get self into $a0
 
     bne     $a0    $zero      label0      #call: protect from dispatch to void
     la      $a0    str_const0               #call: constant object with name of the file
-    li      $t1    3                   #call: line number
+    li      $t1    2                   #call: line number
     jal    _dispatch_abort                  #call: message and die
 label0:
 
     lw      $t1    8($a0)                 #call: ptr to dispatch table
-    lw      $t1    16($t1)              #call: method out_int is at offset 16
+    lw      $t1    0($t1)              #call: method abort is at offset 0
     jalr    $t1
+
+    la      $a0     int_const0           #literal, 0
 
     lw      $fp    12($sp)         #outm: restore 12
     lw      $s0    8($sp)         #outm: restore 8 (self)
