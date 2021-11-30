@@ -93,12 +93,40 @@ class CodegenListener(CoolListener):
                 ctx.codegen += _expr.codegen
 
         # TODO: All other Let implementation
+    
+    def enterCase(self, ctx: CoolParser.CaseContext):
+        _ids = ctx.ID()
+        for _id in _ids:
+            self.idx_stack += len(_ids)
+            self.locals_idx[_id.getText()] = f'{(3 + self.idx_stack) * 4}($fp)'
+            self.num_locals += 1
 
     def exitCase(self, ctx: CoolParser.CaseContext):
-        # TODO: Case implementation
-        # Type Rule: Union of all branches
-        # _firstName = _types[0].getText()
-        pass
+        _exprs = ctx.expr()
+        _test = _exprs[0].codegen
+        _filename = storage.str_const_dict[storage.FILENAME_STR]
+        _line = ctx.start.line
+        _labelNotVoid = f'label{self.num_labels}'
+        self.num_labels += 1
+        k_begin = dict(test_expr=_test, fileName=_filename, line=_line, labelNotVoid=_labelNotVoid)
+        ctx.codegen = asm.caseTpl_begin.substitute(k_begin)
+
+        # TODO: Next steps in case
+        end_label = f'label{self.num_labels}'
+        self.num_labels += 1
+        for idx, _expr in reversed(list(enumerate(_exprs))):
+            if idx > 0:
+                _type_name = _expr.nametype
+                _min_max = storage.classes_min_max[_type_name]
+                next_label = f'label{self.num_labels}'
+                self.num_labels += 1
+                _symbol = _expr.namesymbol
+                _address = self.locals_idx[_symbol] # TODO: Inconsistencies with addresses
+                k_branch = dict(minChild=_min_max[0], maxChild=_min_max[1], name=_type_name, nextLbl=next_label, address=_address, symbol=_symbol, exp=_expr.codegen, labelEnd=end_label)
+                ctx.codegen += asm.caseBranch.substitute(k_branch)
+
+        k_end = dict(endLbl=end_label)
+        ctx.codegen += asm.caseTpl_end.substitute(k_end)
 
     def exitNew(self, ctx: CoolParser.NewContext):
         _klass_name = ctx.nameklass

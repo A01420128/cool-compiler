@@ -366,7 +366,7 @@ newTpl_SELF_TYPE = Template("""
 #definir: test_expr, fileName, line, labelNotVoid
 caseTpl_begin = Template("""
     $test_expr
-    bne     $$a0    $$zero  $labelVoid      #case: protect from case on void (abort)
+    bne     $$a0    $$zero  $labelNotVoid      #case: protect from case on void (abort)
     la      $$a0    str_const0              #case: fileName
     li      $$t1    $line                   #case: line number
     jal    _case_abort2
@@ -387,4 +387,5 @@ $nextLbl:
 #definir: labelEnd
 caseTpl_end = Template("""
     jal     _case_abort                     #case: default
+$endLbl:
 """)

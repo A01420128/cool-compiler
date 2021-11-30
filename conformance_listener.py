@@ -218,6 +218,7 @@ class ConformanceListener(CoolListener):
     def enterCase(self, ctx: CoolParser.CaseContext):
         # Get all ids and types defined in case.
         _ids = ctx.ID()
+        _exprs = ctx.expr()
         _types = ctx.TYPE()
 
         # There should not be repeated types
@@ -231,6 +232,8 @@ class ConformanceListener(CoolListener):
 
             # Save the types of all ids defined
             _saved.add(_type)
+            _exprs[i+1].nametype = _type
+            _exprs[i+1].namesymbol = _id.getText()
             self.idsTypes.openScope()
             self.idsTypes[_id.getText()] = _types[i].getText()
         

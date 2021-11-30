@@ -209,6 +209,7 @@ def templates(o):
         o.p('.word', '-1')
         o.p(f'{_class_name}_protObj')
         o.p('.word', i)
+        storage.classes_offset[_class_name] = i
         o.p('.word', prot_size)
         o.p('.word', f'{_class_name}_dispTab')
         # to_accum = f'{t}.word{t}-1\n{_class.name}_protObj:\n{t}.word{t}{i}\n{t}.word{t}{prot_size}\n{t}.word{t}{_class_name}_dispTab\n'
@@ -239,7 +240,6 @@ def global_text(o):
 
 def class_inits(o):
     for _class_name in storage.all_classes_names:
-        # TODO: Missing initializers for parametres, now only doing the regular call method protocol.
         o.p(f'{_class_name}_init')
         o.accum += """    addiu	$sp $sp -12 
     sw	$fp 12($sp) 
@@ -249,6 +249,17 @@ def class_inits(o):
     move	$s0 $a0 
 """
         _class = storage.lookupClass(_class_name)
+
+        # Calculate min max for cases
+        # TODO: Check if it works with different order of klasses
+        _min = storage.classes_offset[_class_name]
+        _max = _min
+        for _traversed_name in storage.all_classes_names:
+            _traversed = storage.lookupClass(_traversed_name)
+            if _class.conforms(_traversed):
+                _max = storage.classes_offset[_traversed.name]
+        storage.classes_min_max[_class_name] = [_min, _max]
+
         if _class.inherits != _class_name:
             o.accum += f'    jal {_class.inherits}_init\n' # Add initializer
         o.accum += """    move	$a0 $s0 
@@ -278,8 +289,8 @@ def genCode(walker, tree, file_name):
     
 if __name__ == '__main__':
     # Ejecutar como: "python codegen.py <filename>" donde filename es el nombre de alguna de las pruebas
-    file_name = sys.argv[1]
-    # file_name = 'basic-init'
+    # file_name = sys.argv[1]
+    file_name = 'case-order'
     parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % file_name))))
 
     walker = ParseTreeWalker()
