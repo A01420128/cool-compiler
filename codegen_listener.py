@@ -174,14 +174,28 @@ class CodegenListener(CoolListener):
         ctx.codegen += asm.callTpl_instance.substitute(k_dispatch)
         
     def exitAt(self, ctx: CoolParser.AtContext):
-        # TODO: At implementation
-        # _expr = ctx.expr()
-        _type = ctx.TYPE().getText()
-        # Type Rule: Pass type of the method being called
-        # _methodType = _right.lookupMethod(_id).type
-        # Type Rule: Same as right side. Validate later.
-        # storage.ctxTypes[ctx] = _methodType
-        pass
+        # Call implementation
+        # Write all expr inside
+        ctx.codegen = ''
+        for _expr in ctx.expr():
+            ctx.codegen += _expr.codegen
+            # Push Param
+            ctx.codegen += asm.callParametersTpl.substitute()
+
+        # Second type of call
+        ctx.codegen += asm.callStr1.substitute()
+
+        line_number = ctx.start.line
+        k_filename = dict(fileName=storage.str_const_dict[storage.FILENAME_STR], line=line_number, label=f'label{self.num_labels}')
+        self.num_labels += 1
+        ctx.codegen += asm.callTpl1.substitute(k_filename)
+        
+        # Call dispatch to method offset
+        class_name = ctx.nameklass
+        method_name = ctx.namemethod
+        offset = storage.disp_methods_off[f'{class_name}.{method_name}'] * 4
+        k_dispatch = dict(off=offset, method=method_name)
+        ctx.codegen += asm.callTpl_instance.substitute(k_dispatch)
     
     def exitNeg(self, ctx: CoolParser.NegContext):
         ctx.codegen = asm.negStr.substitute()

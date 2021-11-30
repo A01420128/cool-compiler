@@ -387,6 +387,8 @@ class ConformanceListener(CoolListener):
         # Type Rule: Same as right side. Validate later.
         storage.ctxTypes[ctx] = _methodType
         ctx.typename = _methodType
+        ctx.nameklass = _leftType
+        ctx.namemethod = _id
         for _ex in _expr:
             self.idsTypes.closeScope()
     
