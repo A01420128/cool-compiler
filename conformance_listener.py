@@ -571,6 +571,7 @@ class ConformanceListener(CoolListener):
             _type = self.idsTypes[_id]
             storage.ctxTypes[ctx] = _type
             ctx.typename = _type
+            ctx.namesymbol = _id
         except KeyError:
             raise myexceptions.UndeclaredIdentifier
     

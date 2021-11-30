@@ -170,7 +170,7 @@ letdeclTpl2 = Template("""
 
 #definir: $address, $symbol, $klass
 varTpl = Template("""
-    lw      $a0     $address            #obj: load [$symbol], $klass
+    lw      $$a0     $address            #obj: load [$symbol], $klass
 """)
 
 negStr = """
@@ -275,7 +275,7 @@ $right_subexp
     move    $$t2    $$a0                    #=:
         
     la      $$a0    bool_const1             #=: load true
-    beq     $$t1    $$t2                    #=: if identical (same address)
+    beq     $$t1    $$t2    $label          #=: if identical (same address)
         
     la      $$a1    bool_const0             #=: load false
     jal     equality_test                   #=: the runtime will know...
@@ -288,6 +288,7 @@ callParametersTpl = Template("""
     addiu   $$sp    $$sp        -4          #call:
 """)
 
+# TODO: Multiple parameters
 # Para el call hay 3 tipos y $$a0 cambia (instancia sobre la que se llama el método) 
 # 1. metodo( params ... )
 callStr1 = Template("""

@@ -12,6 +12,10 @@ class CodegenListener(CoolListener):
         super().__init__()
         self.o = o
         self.num_labels = 0
+        self.num_formals = 0
+
+    def enterMethod(self, ctx: CoolParser.MethodContext):
+        self.num_formals = 0
 
     def exitMethod(self, ctx: CoolParser.MethodContext):
         # In proto
@@ -24,25 +28,27 @@ class CodegenListener(CoolListener):
         self.o.accum += ctx.expr().codegen
 
         # Out proto
-        # TODO: Get formals
-        num_formals = 0
-        k_out = dict(ts=ts, fp=ts, s0=ts-4, ra=ts-8, formals=num_formals, locals=num_locals, everything=num_formals+ts) # FIXME: ts is locals frame?
+        formals = self.num_formals * 4
+        k_out = dict(ts=ts, fp=ts, s0=ts-4, ra=ts-8, formals=formals, locals=num_locals, everything=formals+ts) # FIXME: ts is locals frame?
         self.o.accum += asm.methodTpl_out.substitute(k_out)
 
-    def enterFormal(self, ctx: CoolParser.FormalContext):
-        # TODO something to count
-        pass
+    def exitFormal(self, ctx: CoolParser.FormalContext):
+        self.num_formals += 1
 
     def exitBase(self, ctx: CoolParser.BaseContext):
         # Type Rule: Pass child type
         ctx.codegen = ctx.getChild(0).codegen
     
     def exitIf(self, ctx: CoolParser.IfContext):
-        # TODO: If implementation
-        # Type Rule: The union of the two branches
-        # _trueType = storage.ctxTypes[ctx.expr()[1]]
-        # _falseType = storage.ctxTypes[ctx.expr()[2]]
-        pass
+        _test = ctx.expr()[0].codegen
+        _true = ctx.expr()[1].codegen
+        _false = ctx.expr()[2].codegen
+        label_false = f'label{self.num_labels}'
+        self.num_labels += 1
+        label_exit = f'label{self.num_labels}'
+        self.num_labels += 1
+        k = dict(test_subexp=_test, true_subexp=_true, false_subexp=_false, label_false=label_false, label_exit=label_exit)
+        ctx.codegen = asm.ifTpl.substitute(k)
     
     def exitWhile(self, ctx: CoolParser.WhileContext):
         # TODO: While implementation
@@ -165,12 +171,11 @@ class CodegenListener(CoolListener):
         pass
 
     def exitEq(self, ctx: CoolParser.EqContext):
-        # TODO: Eq implementation
-        # Type rule: compare freely except if type Int, String or Bool, compare to same.
-        # _expr = ctx.expr()
-        # _left = storage.ctxTypes[_expr[0]]
-        # _right = storage.ctxTypes[_expr[1]]
-        pass
+        _left = ctx.expr()[0].codegen
+        _right = ctx.expr()[1].codegen
+        k = dict(left_subexp=_left, right_subexp=_right, label=f'label{self.num_labels}')
+        self.num_labels += 1
+        ctx.codegen = asm.eqTpl.substitute(k)
 
     def exitNot(self, ctx: CoolParser.NotContext):
         # TODO: Not implementation
@@ -189,15 +194,9 @@ class CodegenListener(CoolListener):
         ctx.codegen = ctx.expr().codegen
 
     def exitObject(self, ctx: CoolParser.ObjectContext):
-        # TODO: Object implementation
-        # Type rule: Pass type of ID
-        # _id = ctx.ID().getText()
-
-        # Check if object is in scope
-        # try:
-            # _type = self.idsTypes[_id]
-            # storage.ctxTypes[ctx] = _type
-        pass
+        address = '12($fp)' # TODO: Get correct address of parameter, related to stack?
+        k = dict(address=address, symbol=ctx.namesymbol, klass=ctx.typename)
+        ctx.codegen = asm.varTpl.substitute(k)
     
     def exitInteger(self, ctx: CoolParser.IntegerContext):
         literal = storage.int_const_dict[ctx.literalval]

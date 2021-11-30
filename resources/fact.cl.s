@@ -374,21 +374,21 @@ Main.fact:
 	sw	$s0 16($sp)
 	sw	$ra 12($sp)
 	addiu	$fp $sp 4
-	move	$s0 $a0
-	sw	$s1 4($fp)
-	sw	$s2 0($fp)
+	move	$s0 $a0 # Finish method_in
+	sw	$s1 4($fp) # Object n
+	sw	$s2 0($fp) # Left subexp of eq
 	lw	$s2 20($fp)
-	la	$t2 int_const0
+	la	$t2 int_const0 # Right sub exp of eq
 	move	$t1 $s2
 	la	$a0 bool_const1
 	beq	$t1 $t2 label2
 	la	$a1 bool_const0
 	jal	equality_test
-label2:
-	lw	$t1 12($a0)
-	beqz	$t1 label0
-	la	$a0 int_const1
-	b	label1
+label2: # End of eq
+	lw	$t1 12($a0) # Start of if
+	beqz	$t1 label0 # if
+	la	$a0 int_const1 # True subexp
+	b	label1 # Jump to end if
 label0:
 	lw	$s2 20($fp)
 	lw	$s1 20($fp)
