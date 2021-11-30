@@ -116,7 +116,7 @@ class KlassListener(CoolListener):
     def setBaseClasses(self):
         k = storage.Klass('Object')
         k.addMethod('abort', storage.Method('Object'))
-        k.addMethod('type_name', storage.Method('Object'))
+        k.addMethod('type_name', storage.Method('String'))
         k.addMethod('copy', storage.Method('SELF_TYPE'))
         self.baseKlasses['Object'] = k
         k = storage.Klass('IO')

@@ -29,7 +29,7 @@ _MemMgr_TEST:
     .word   0
 
     .word   -1
-str_const9:
+str_const10:
     .word   4
     .word   6
     .word   String_dispTab
@@ -39,7 +39,7 @@ str_const9:
     .align  2
 
     .word   -1
-str_const8:
+str_const9:
     .word   4
     .word   5
     .word   String_dispTab
@@ -49,7 +49,7 @@ str_const8:
     .align  2
 
     .word   -1
-str_const7:
+str_const8:
     .word   4
     .word   5
     .word   String_dispTab
@@ -59,7 +59,7 @@ str_const7:
     .align  2
 
     .word   -1
-str_const6:
+str_const7:
     .word   4
     .word   6
     .word   String_dispTab
@@ -69,7 +69,7 @@ str_const6:
     .align  2
 
     .word   -1
-str_const5:
+str_const6:
     .word   4
     .word   6
     .word   String_dispTab
@@ -79,12 +79,21 @@ str_const5:
     .align  2
 
     .word   -1
-str_const4:
+str_const5:
     .word   4
     .word   6
     .word   String_dispTab
     .word   int_const4
     .ascii  "Main"
+    .byte   0
+    .align  2
+
+    .word   -1
+str_const4:
+    .word   4
+    .word   5
+    .word   String_dispTab
+    .word   int_const0
     .byte   0
     .align  2
 
@@ -190,12 +199,12 @@ bool_const1:
     .word   Bool_dispTab
     .word   1
 class_nameTab:
+    .word    str_const10
     .word    str_const9
     .word    str_const8
     .word    str_const7
     .word    str_const6
     .word    str_const5
-    .word    str_const4
 class_objTab:
     .word    Object_protObj
     .word    Object_init
@@ -261,13 +270,13 @@ Int_protObj:
     .word    2
     .word    4
     .word    Int_dispTab
-    .word    0
+    .word    int_const0
     .word    -1
 Bool_protObj:
     .word    3
     .word    4
     .word    Bool_dispTab
-    .word    0
+    .word    int_const0
     .word    -1
 String_protObj:
     .word    4

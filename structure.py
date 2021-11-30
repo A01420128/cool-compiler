@@ -311,7 +311,7 @@ class PruebasConScopes(unittest.TestCase):
 def setBaseClasses():
     k = Klass('Object')
     k.addMethod('abort', Method('Object'))
-    k.addMethod('type_name', Method('Object'))
+    k.addMethod('type_name', Method('String'))
     k.addMethod('copy', Method('SELF_TYPE'))
     allClasses['Object'] = k
     k = Klass('IO')

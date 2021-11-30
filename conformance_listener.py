@@ -115,6 +115,7 @@ class ConformanceListener(CoolListener):
             pass
 
         # Save id type
+        ctx.namesymbol = _id
         self.idsTypes[_id] = _type
         self.idsTypes.openScope()
     
@@ -250,6 +251,7 @@ class ConformanceListener(CoolListener):
         _type = ctx.TYPE().getText()
         storage.ctxTypes[ctx] = _type
         ctx.typename = _type
+        ctx.nameklass = _type
         self.idsTypes.closeScope()
     
     def enterBlock(self, ctx: CoolParser.BlockContext):

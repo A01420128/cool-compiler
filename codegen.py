@@ -83,8 +83,11 @@ def constants(o):
     used_int_idx = 1
 
     # Adding filename to strings
-    if '--filename--' not in storage.stringConst:
+    if storage.FILENAME_STR not in storage.stringConst:
         storage.stringConst.append(storage.FILENAME_STR)
+    
+    if '' not in storage.stringConst:
+        storage.stringConst.append('')
 
     # Adding all clases names as strings
     # Setting the tag order of classes
@@ -123,7 +126,10 @@ def constants(o):
             used_int_idx += 1
 
         storage.str_const_dict[s] = f'str_const{i}'
-        o.accum += asm.cTplStr.substitute(idx=i, tag=STR_TAG, size=str_obj_size, sizeIdx=this_int_idx, value=s)
+        if s == "":
+            o.accum += asm.cTplStr_empty.substitute(idx=i, tag=STR_TAG, size=str_obj_size, sizeIdx=this_int_idx)
+        else:
+            o.accum += asm.cTplStr.substitute(idx=i, tag=STR_TAG, size=str_obj_size, sizeIdx=this_int_idx, value=s)
     
     # Adding all ints from storage
     for _int in storage.intConst:
@@ -211,9 +217,16 @@ def templates(o):
             o.p('.word', '0')
             # to_accum += f'{t}.word{t}int_const0\n{t}.word{t}0\n'
         else:
-            for _atr in _class.attributes.keys():
+            for _atr, _klass in _class.attributes.items():
                 # to_accum += f'{t}.word{t}0\n' # Inserting void in not know attributes
-                o.p('.word', '0')
+                empty_attr = '0'; 
+                if _klass == 'String':
+                    empty_attr = storage.str_const_dict['']
+                if _klass == 'Int':
+                    empty_attr = storage.int_const_dict[0]
+                if _klass == 'Bool':
+                    empty_attr = 'bool_const0'
+                o.p('.word', empty_attr)
     
         # o.accum += to_accum
 
@@ -265,8 +278,8 @@ def genCode(walker, tree, file_name):
     
 if __name__ == '__main__':
     # Ejecutar como: "python codegen.py <filename>" donde filename es el nombre de alguna de las pruebas
-    file_name = sys.argv[1]
-    # file_name = 'assignment-val'
+    # file_name = sys.argv[1]
+    file_name = 'basic-init'
     parser = CoolParser(CommonTokenStream(CoolLexer(FileStream("resources/codegen/input/%s.cool" % file_name))))
 
     walker = ParseTreeWalker()

@@ -45,6 +45,17 @@ int_const$idx:
     .word   $value
 """)
 
+cTplStr_empty = Template("""
+    .word   -1
+str_const$idx:
+    .word   $tag
+    .word   $size
+    .word   String_dispTab
+    .word   int_const$sizeIdx
+    .byte   0
+    .align  2
+""")
+
 cTplStr = Template("""
     .word   -1
 str_const$idx:
@@ -230,7 +241,6 @@ $label_exit:
 
 #definir: label_exit
 isVoidTpl = Template("""
-$label_exit:
 $subexp
     move    $$t1    $$a0                    #isvoid: load self into $$t1
     la      $$a0    bool_const1             #isvoid: load true into $$a0
@@ -341,7 +351,7 @@ newTpl_explicit = Template("""
     }
 """)
 
-newTpl_SELF_TYPE = """
+newTpl_SELF_TYPE = Template("""
     la      $$t1    class_objTab            #new: self_type, go and find class
     lw      $$t2    0($$s0)                 #new: load tag
     sll     $$t2    $$t2      3             #new: mult by 8 (4 words x 2 places (prot, init))
@@ -351,7 +361,7 @@ newTpl_SELF_TYPE = """
     jal     Object.copy                     #new: make a copy
     lw      $$t1    4($$s1)                 #new: add 1 word to find _init
     jalr    $$t1                            #new: call _init
-"""
+""")
 
 #definir: test_expr, fileName, line, labelNotVoid
 caseTpl_begin = Template("""

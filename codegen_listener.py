@@ -16,16 +16,20 @@ class CodegenListener(CoolListener):
         self.num_locals = 0
         self.idx_stack = -1
         self.locals_idx = dict()
+        self.num_attr = 0
 
+    def exitAtribute(self, ctx: CoolParser.AtributeContext):
+        # TODO: Missing <- in parameters
+        self.locals_idx[ctx.namesymbol] = f'{(3 + self.num_attr) * 4}($s0)'
+        self.num_attr += 1
+        
     def enterMethod(self, ctx: CoolParser.MethodContext):
         self.num_formals = 0
         self.num_locals = 0
         self.idx_stack = -1
-        self.locals_idx = dict()
 
     def exitMethod(self, ctx: CoolParser.MethodContext):
         # In proto
-        # TODO: Get number of locals
         ts = (3 + self.num_locals) * 4
         k_in = dict(klass=ctx.nameklass, method=ctx.namemethod, ts=ts, fp=ts, s0=ts-4, ra=ts-8, locals=self.num_locals)
         self.o.accum += asm.methodTpl_in.substitute(k_in)
@@ -40,7 +44,7 @@ class CodegenListener(CoolListener):
     def enterFormal(self, ctx: CoolParser.FormalContext):
         self.num_formals += 1
         self.idx_stack += 1
-        self.locals_idx[ctx.nameformal] = (3 + self.idx_stack) * 4
+        self.locals_idx[ctx.nameformal] = f'{(3 + self.idx_stack) * 4}($fp)'
 
     def exitBase(self, ctx: CoolParser.BaseContext):
         # Type Rule: Pass child type
@@ -70,7 +74,7 @@ class CodegenListener(CoolListener):
             if i < (len(_exprs) - 1):
                 _symbol = _expr.namesymbol
                 self.idx_stack += 1
-                self.locals_idx[_symbol] = self.idx_stack
+                self.locals_idx[_symbol] = f'{self.idx_stack}($fp)'
                 self.num_locals += 1
 
     
@@ -82,7 +86,7 @@ class CodegenListener(CoolListener):
                 _expr_code = _expr.codegen
                 _symbol = _expr.namesymbol
                 # TODO: Set correct addres, maybe locals?
-                address = f'{self.locals_idx[_symbol]}($fp)'
+                address = self.locals_idx[_symbol]
                 k = dict(expr=_expr_code, address=address, symbol=_symbol)
                 ctx.codegen = asm.letdeclTpl1.substitute(k)
             else:
@@ -97,10 +101,12 @@ class CodegenListener(CoolListener):
         pass
 
     def exitNew(self, ctx: CoolParser.NewContext):
-        # TODO: New implementation
-        # Type Rule: Pass type in rule
-        # _type = ctx.TYPE().getText()
-        pass
+        _klass_name = ctx.nameklass
+        if _klass_name != 'SELF_TYPE':
+            k = dict(klass=ctx.nameklass)
+            ctx.codegen = asm.newTpl_explicit.substitute(k)
+        else:
+            ctx.codegen = asm.newTpl_SELF_TYPE.substitute()
 
     def exitBlock(self, ctx: CoolParser.BlockContext):
         # Block implementation: Add all code in all expressions
@@ -153,11 +159,10 @@ class CodegenListener(CoolListener):
         pass
     
     def exitIsvoid(self, ctx: CoolParser.IsvoidContext):
-        # TODO: Isvoid implementation
-        # Type Rule: pass Bool
-        # storage.ctxTypes[ctx] = 'Bool'
-        # self.idsTypes.closeScope()
-        pass
+        _expr = ctx.expr().codegen
+        k = dict(subexp=_expr, label_exit=f'label{self.num_labels}')
+        self.num_labels += 1
+        ctx.codegen = asm.isVoidTpl.substitute(k)
 
     def exitMult(self, ctx: CoolParser.MultContext):
         _left = ctx.getChild(0).codegen
@@ -213,7 +218,7 @@ class CodegenListener(CoolListener):
         _id = ctx.ID().getText()
         _expr = ctx.expr().codegen
         # TODO: Find address with id
-        address = f'0($fp)'
+        address = self.locals_idx[_id]
         k = dict(expr=_expr, address=address, symbol=_id)
         ctx.codegen = asm.assignTpl.substitute(k)
 
@@ -222,8 +227,7 @@ class CodegenListener(CoolListener):
 
     def exitObject(self, ctx: CoolParser.ObjectContext):
         # Pop from idx_stack on load
-        off = self.locals_idx[ctx.namesymbol]
-        address = f'{off}($fp)'
+        address = self.locals_idx[ctx.namesymbol]
         k = dict(address=address, symbol=ctx.namesymbol, klass=ctx.typename)
         ctx.codegen = asm.varTpl.substitute(k)
     
