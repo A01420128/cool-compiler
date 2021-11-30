@@ -13,9 +13,11 @@ class CodegenListener(CoolListener):
         self.o = o
         self.num_labels = 0
         self.num_formals = 0
+        self.idx_stack = -1
 
     def enterMethod(self, ctx: CoolParser.MethodContext):
         self.num_formals = 0
+        self.idx_stack = -1
 
     def exitMethod(self, ctx: CoolParser.MethodContext):
         # In proto
@@ -34,6 +36,7 @@ class CodegenListener(CoolListener):
 
     def exitFormal(self, ctx: CoolParser.FormalContext):
         self.num_formals += 1
+        self.idx_stack += 1
 
     def exitBase(self, ctx: CoolParser.BaseContext):
         # Type Rule: Pass child type
@@ -86,9 +89,8 @@ class CodegenListener(CoolListener):
         ctx.codegen = ''
         for _expr in ctx.expr():
             ctx.codegen += _expr.codegen
-        
-        # Push Param
-        ctx.codegen += asm.callParametersTpl.substitute()
+            # Push Param
+            ctx.codegen += asm.callParametersTpl.substitute()
 
         # 3 types of call, 1 with . 2 with ()
         _starter = ctx.getChild(1).getText()
@@ -194,18 +196,21 @@ class CodegenListener(CoolListener):
         ctx.codegen = ctx.expr().codegen
 
     def exitObject(self, ctx: CoolParser.ObjectContext):
-        address = '12($fp)' # TODO: Get correct address of parameter, related to stack?
+        # Pop from idx_stack on load
+        off = (3 + self.idx_stack) * 4
+        self.idx_stack -= 1
+        address = f'{off}($fp)'
         k = dict(address=address, symbol=ctx.namesymbol, klass=ctx.typename)
         ctx.codegen = asm.varTpl.substitute(k)
     
     def exitInteger(self, ctx: CoolParser.IntegerContext):
         literal = storage.int_const_dict[ctx.literalval]
-        k = dict(literal=literal, value=literal)
+        k = dict(literal=literal, value=ctx.literalval)
         ctx.codegen = asm.litTpl.substitute(k)
 
     def exitString(self, ctx: CoolParser.StringContext):
         literal = storage.str_const_dict[ctx.literalval]
-        k = dict(literal=literal, value=literal)
+        k = dict(literal=literal, value=ctx.literalval)
         ctx.codegen = asm.litTpl.substitute(k)
     
     def exitBool(self, ctx: CoolParser.BoolContext):
