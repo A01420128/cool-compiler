@@ -62,11 +62,14 @@ class CodegenListener(CoolListener):
         ctx.codegen = asm.ifTpl.substitute(k)
     
     def exitWhile(self, ctx: CoolParser.WhileContext):
-        # TODO: While implementation
-        # Type Rule: Pass object
-        # storage.ctxTypes[ctx] = 'Object'
-        # ctx.typename = 'Object'
-        pass
+        _loop_label = f'label{self.num_labels}'
+        self.num_labels += 1
+        _exit_label = f'label{self.num_labels}'
+        self.num_labels += 1
+        _test = ctx.expr()[0].codegen
+        _loop_expr = ctx.expr()[1].codegen
+        k = dict(label_loop=_loop_label, test_subexp=_test, loop_subexp=_loop_expr, label_exit=_exit_label)
+        ctx.codegen = asm.whileTpl.substitute(k)
 
     def enterLet(self, ctx: CoolParser.LetContext):
         _exprs = ctx.expr()
