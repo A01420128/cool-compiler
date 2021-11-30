@@ -131,6 +131,7 @@ class ConformanceListener(CoolListener):
         if _type == 'SELF_TYPE':
             raise myexceptions.SelftypeInvalidUseException
         
+        ctx.nameformal = _id
         # This was entered when froming klasses
         # self.idsTypes[_id] = _type
     
@@ -190,6 +191,7 @@ class ConformanceListener(CoolListener):
     
     def exitLet(self, ctx: CoolParser.LetContext):
         _types = ctx.TYPE()
+        _ids = ctx.ID()
         _expr = ctx.expr()
 
         # Check conformance of every saved expected type and its expression asigned.
@@ -197,6 +199,7 @@ class ConformanceListener(CoolListener):
             # Only for all expr except the last one.
             if i < (len(_expr) - 1):
                 _assign = storage.lookupClass(storage.ctxTypes[_expr[i]])
+                _expr[i].namesymbol = _ids[i].getText()
                 _to = storage.lookupClass(_type.getText())
                 if not _to.conforms(_assign):
                     raise myexceptions.DoesNotConform

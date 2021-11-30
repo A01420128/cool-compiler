@@ -399,12 +399,12 @@ Main.sum_func:
     move    $s0    $a0                #inm: self to $s0
 
 
-    lw      $a0     16($fp)            #obj: load [a], Int
+    lw      $a0     12($fp)            #obj: load [a], Int
 
     sw      $a0     0($sp)            #arith: push left subexp into the stack
     addiu   $sp     $sp       -4      #arith
 
-    lw      $a0     12($fp)            #obj: load [b], Int
+    lw      $a0     16($fp)            #obj: load [b], Int
 
     jal     Object.copy                 #arith: get a copy to store value on
     lw      $s1    4($sp)             #arith: pop saved value from the stack to $s1

@@ -13,30 +13,34 @@ class CodegenListener(CoolListener):
         self.o = o
         self.num_labels = 0
         self.num_formals = 0
+        self.num_locals = 0
         self.idx_stack = -1
+        self.locals_idx = dict()
 
     def enterMethod(self, ctx: CoolParser.MethodContext):
         self.num_formals = 0
+        self.num_locals = 0
         self.idx_stack = -1
+        self.locals_idx = dict()
 
     def exitMethod(self, ctx: CoolParser.MethodContext):
         # In proto
         # TODO: Get number of locals
-        num_locals = 0
-        ts = (3 + num_locals) * 4
-        k_in = dict(klass=ctx.nameklass, method=ctx.namemethod, ts=ts, fp=ts, s0=ts-4, ra=ts-8, locals=num_locals)
+        ts = (3 + self.num_locals) * 4
+        k_in = dict(klass=ctx.nameklass, method=ctx.namemethod, ts=ts, fp=ts, s0=ts-4, ra=ts-8, locals=self.num_locals)
         self.o.accum += asm.methodTpl_in.substitute(k_in)
 
         self.o.accum += ctx.expr().codegen
 
         # Out proto
         formals = self.num_formals * 4
-        k_out = dict(ts=ts, fp=ts, s0=ts-4, ra=ts-8, formals=formals, locals=num_locals, everything=formals+ts) # FIXME: ts is locals frame?
+        k_out = dict(ts=ts, fp=ts, s0=ts-4, ra=ts-8, formals=formals, locals=self.num_locals, everything=formals+ts) # FIXME: ts is locals frame?
         self.o.accum += asm.methodTpl_out.substitute(k_out)
 
-    def exitFormal(self, ctx: CoolParser.FormalContext):
+    def enterFormal(self, ctx: CoolParser.FormalContext):
         self.num_formals += 1
         self.idx_stack += 1
+        self.locals_idx[ctx.nameformal] = (3 + self.idx_stack) * 4
 
     def exitBase(self, ctx: CoolParser.BaseContext):
         # Type Rule: Pass child type
@@ -59,11 +63,32 @@ class CodegenListener(CoolListener):
         # storage.ctxTypes[ctx] = 'Object'
         # ctx.typename = 'Object'
         pass
+
+    def enterLet(self, ctx: CoolParser.LetContext):
+        _exprs = ctx.expr()
+        for i, _expr in enumerate(_exprs):
+            if i < (len(_exprs) - 1):
+                _symbol = _expr.namesymbol
+                self.idx_stack += 1
+                self.locals_idx[_symbol] = self.idx_stack
+                self.num_locals += 1
+
     
     def exitLet(self, ctx: CoolParser.LetContext):
-        # TODO: Let implementation
-        # storage.ctxTypes[ctx] = _lastType
-        pass
+        _exprs = ctx.expr()
+        ctx.codegen = ''
+        for i, _expr in enumerate(_exprs):
+            if i < (len(_exprs) - 1):
+                _expr_code = _expr.codegen
+                _symbol = _expr.namesymbol
+                # TODO: Set correct addres, maybe locals?
+                address = f'{self.locals_idx[_symbol]}($fp)'
+                k = dict(expr=_expr_code, address=address, symbol=_symbol)
+                ctx.codegen = asm.letdeclTpl1.substitute(k)
+            else:
+                ctx.codegen += _expr.codegen
+
+        # TODO: All other Let implementation
 
     def exitCase(self, ctx: CoolParser.CaseContext):
         # TODO: Case implementation
@@ -159,18 +184,18 @@ class CodegenListener(CoolListener):
         ctx.codegen = asm.arithTpl.substitute(k)
 
     def exitLt(self, ctx: CoolParser.LtContext):
-        # TODO: Lt implementation
-        # Type rule: both expr should be Int, pass Bool
-        # _left = ctx.getChild(0)
-        # _right = ctx.getChild(2)
-        pass
+        _left = ctx.getChild(0).codegen
+        _right = ctx.getChild(2).codegen
+        k = dict(left_subexp=_left, right_subexp=_right, label_exit=f'label{self.num_labels}', ble_or_blt='blt')
+        self.num_labels += 1
+        ctx.codegen = asm.leTpl.substitute(k)
 
     def exitLe(self, ctx: CoolParser.LeContext):
-        # TODO: Le implementation
-        # Type rule: both expr should be Int, pass Bool
-        # _left = ctx.getChild(0)
-        # _right = ctx.getChild(2)
-        pass
+        _left = ctx.getChild(0).codegen
+        _right = ctx.getChild(2).codegen
+        k = dict(left_subexp=_left, right_subexp=_right, label_exit=f'label{self.num_labels}', ble_or_blt='ble')
+        self.num_labels += 1
+        ctx.codegen = asm.leTpl.substitute(k)
 
     def exitEq(self, ctx: CoolParser.EqContext):
         _left = ctx.expr()[0].codegen
@@ -185,20 +210,19 @@ class CodegenListener(CoolListener):
         pass
 
     def exitAssign(self, ctx: CoolParser.AssignContext):
-        # TODO: Assign implementation
-        # Check conformance of types
-        # _id = ctx.ID().getText()
-        # _expr = ctx.expr()
-        # _idType = self.idsTypes[ctx.ID().getText()]
-        pass
+        _id = ctx.ID().getText()
+        _expr = ctx.expr().codegen
+        # TODO: Find address with id
+        address = f'0($fp)'
+        k = dict(expr=_expr, address=address, symbol=_id)
+        ctx.codegen = asm.assignTpl.substitute(k)
 
     def exitParens(self, ctx: CoolParser.ParensContext):
         ctx.codegen = ctx.expr().codegen
 
     def exitObject(self, ctx: CoolParser.ObjectContext):
         # Pop from idx_stack on load
-        off = (3 + self.idx_stack) * 4
-        self.idx_stack -= 1
+        off = self.locals_idx[ctx.namesymbol]
         address = f'{off}($fp)'
         k = dict(address=address, symbol=ctx.namesymbol, klass=ctx.typename)
         ctx.codegen = asm.varTpl.substitute(k)
@@ -215,6 +239,5 @@ class CodegenListener(CoolListener):
     
     def exitBool(self, ctx: CoolParser.BoolContext):
         # TODO: Bool implementation
-        # Type Rule: Pass 'Bool'
-        # storage.ctxTypes[ctx] = 'Bool'
+        # Bools are saved as constanst and accesed that way, only two addresses
         pass

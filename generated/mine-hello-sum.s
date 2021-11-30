@@ -355,7 +355,7 @@ Main.main:
     addiu   $fp    $sp    4           #inm: $fp points to locals
     move    $s0    $a0                #inm: self to $s0
 
-    la      $a0     str_const0           #literal, str_const0
+    la      $a0     str_const0           #literal, Hello world!
 
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:
@@ -373,12 +373,12 @@ label0:
     jalr    $t1
 
 
-    la      $a0     int_const2           #literal, int_const2
+    la      $a0     int_const2           #literal, 2
 
     sw      $a0     0($sp)            #arith: push left subexp into the stack
     addiu   $sp     $sp       -4      #arith
 
-    la      $a0     int_const3           #literal, int_const3
+    la      $a0     int_const3           #literal, 3
 
     jal     Object.copy                 #arith: get a copy to store value on
     lw      $s1    4($sp)             #arith: pop saved value from the stack to $s1

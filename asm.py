@@ -239,7 +239,7 @@ $subexp
 $label_exit:
 """)
 
-#definir: left_subexp, right_subexp, label_exit
+#definir: left_subexp, right_subexp, label_exit, ble_or_blt
 leTpl = Template("""
 $left_subexp
     sw      $$a0    0($$sp)                 #<: push left subexp into the stack
@@ -252,7 +252,7 @@ $right_subexp
     lw      $$t1    12($$s1)                #<: load temp values
     lw      $$t2    12($$a0)                #<:
     la      $$a0    bool_const1             #<: load true
-    ble     $$t1    $$t2                    #<: exit if less
+    $ble_or_blt     $$t1    $$t2    $label_exit       #<: exit if less
     la      $$a0    bool_const0             #<: load false
 $label_exit:
 """)

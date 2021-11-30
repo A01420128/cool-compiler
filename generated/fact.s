@@ -404,7 +404,7 @@ Main.fact:
     sw      $a0    0($sp)                 #=: push left subexp into the stack
     addiu   $sp    $sp    -4              #=:
 
-    la      $a0     int_const0           #literal, int_const0
+    la      $a0     int_const0           #literal, 0
 
     lw      $s1    4($sp)                 #=: pop saved value from the stack into $s1
     addiu   $sp    $sp     4              #=:
@@ -422,7 +422,7 @@ label0:
     lw      $t1    12($a0)            #if: get value from boolean
     beqz    $t1    label2        #if: jump if false
 
-    la      $a0     int_const6           #literal, int_const6
+    la      $a0     int_const6           #literal, 1
 
     b       label3                 #if: jump to endif
 label2:
@@ -439,7 +439,7 @@ label2:
     sw      $a0     0($sp)            #arith: push left subexp into the stack
     addiu   $sp     $sp       -4      #arith
 
-    la      $a0     int_const6           #literal, int_const6
+    la      $a0     int_const6           #literal, 1
 
     jal     Object.copy                 #arith: get a copy to store value on
     lw      $s1    4($sp)             #arith: pop saved value from the stack to $s1
@@ -489,7 +489,7 @@ Main.main:
     addiu   $fp    $sp    4           #inm: $fp points to locals
     move    $s0    $a0                #inm: self to $s0
 
-    la      $a0     int_const3           #literal, int_const3
+    la      $a0     int_const3           #literal, 3
 
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:
@@ -521,7 +521,7 @@ label5:
     lw      $t1    16($t1)              #call: method out_int is at offset 16
     jalr    $t1
 
-    la      $a0     str_const0           #literal, str_const0
+    la      $a0     str_const0           #literal, \n
 
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:
@@ -538,7 +538,7 @@ label6:
     lw      $t1    12($t1)              #call: method out_string is at offset 12
     jalr    $t1
 
-    la      $a0     int_const7           #literal, int_const7
+    la      $a0     int_const7           #literal, 7
 
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:
@@ -570,7 +570,7 @@ label8:
     lw      $t1    16($t1)              #call: method out_int is at offset 16
     jalr    $t1
 
-    la      $a0     str_const0           #literal, str_const0
+    la      $a0     str_const0           #literal, \n
 
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:
@@ -587,7 +587,7 @@ label9:
     lw      $t1    12($t1)              #call: method out_string is at offset 12
     jalr    $t1
 
-    la      $a0     int_const8           #literal, int_const8
+    la      $a0     int_const8           #literal, 10
 
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:
@@ -619,7 +619,7 @@ label11:
     lw      $t1    16($t1)              #call: method out_int is at offset 16
     jalr    $t1
 
-    la      $a0     str_const0           #literal, str_const0
+    la      $a0     str_const0           #literal, \n
 
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:

@@ -355,7 +355,7 @@ Main.main:
     addiu   $fp    $sp    4           #inm: $fp points to locals
     move    $s0    $a0                #inm: self to $s0
 
-    la      $a0     str_const0           #literal, str_const0
+    la      $a0     str_const0           #literal, Hello world!
 
     sw      $a0    0($sp)                 #call: push Param
     addiu   $sp    $sp        -4          #call:
